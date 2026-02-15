@@ -1,812 +1,3463 @@
-# The "Department of One" Engineering Curriculum
+# 🚀 MLOps Engineering Judgment Curriculum v3.0
 
-**Developing Judgment in the Age of AI-Generated Code**
+## Developing Real Taste Through ML Infrastructure
 
----
+------------------------------------------------------------------------
 
-**Core Thesis:** When LLMs commoditize code implementation, the valuable skill becomes *judgment* — knowing what to build, how it will fail, and whether it should exist at all.
+> **Core Thesis:** When LLMs commoditize code implementation, the
+> valuable skill becomes **taste**---knowing what to build, why it's
+> ugly, and how to make it beautiful.
 
-This curriculum trains you to think like an SRE, CISO, Product Manager, and Engineering Lead simultaneously. You'll learn to supervise AI-generated code the way a senior engineer supervises junior developers.
+------------------------------------------------------------------------
 
----
+# MLOps Engineering Judgment Curriculum v3.0
 
-## Timeline Overview
+## Developing Real Taste Through ML Infrastructure
 
-| Pace | Weekly Hours | Estimated Duration |
-|------|-------------|--------------------|
-| Intense | 40 hrs/week | 8-11 months |
-| Sustainable | 10-15 hrs/week | 24-30 months |
-| Casual | 5 hrs/week | 3-4 years |
+**Core Thesis:** When LLMs commoditize code implementation, the valuable
+skill becomes *taste*---knowing what to build, why it's ugly, and how to
+make it beautiful.
 
-> **Critical:** Don't treat this as a checkbox exercise. The deliverables force you to develop judgment through direct experience with failure.
+**What Changed in v3.0:** - Restructured community requirement as
+gradient, not gate (you'll actually start) - Split Phase 1 into Build +
+Scale with reflection point - Project evolves across phases (not one
+thin project for 9 months) - Defined "ugly" concretely with a taste
+rubric - Reconnected Phase 2 to your actual pain points - Rewrote Phase
+5 around real LLM usage patterns - Added curriculum-level failure
+detection - Fixed code examples, timeline honesty, portfolio claims -
+Added Architecture Decision Records throughout - Moved philosophical
+foundation to the front - Revised cost awareness to use free tier
+strategically (no money wasted)
 
----
+------------------------------------------------------------------------
 
-## Phase 0: Prerequisites & Setup (1-2 Weeks)
+## Why This Curriculum Exists (Read This First)
 
-**Goal:** Remove friction so you can focus on learning, not logistics.
+**The world is shifting:** - 2020: "Can you write React?" = employable -
+2025: LLMs write React competently - 2028: "Can you write React?" =
+table stakes, not differentiator
 
-### Find Your People
+**Three data points:** 1. **Boris** (created Claude Code): "The
+bottleneck was always judgment, taste, and systems thinking. AI just
+made that more obvious." 2. **Paul Graham** (2002): "The recipe for
+great work is: very exacting taste, plus the ability to gratify it." 3.
+**Job market**: Staff+ engineers are hired for judgment, not typing
+speed
 
-Before starting Phase 1, secure your support network. Several exercises (the capstone board, blind incident drills, peer review) *require* other people. Treat this as a hard prerequisite, not an afterthought.
+**LLMs are solving "ability to gratify it" (implementation).** **What
+remains: Developing taste (judgment).**
 
-- [ ] Find a study buddy or mentor who can:
-  - Review your deliverables
-  - Challenge your assumptions
-  - Catch blind spots you can't see
-  - Hold you accountable to timelines
-- [ ] Join at least one community:
-  - Engineering Discord servers
-  - Recurse Center
-  - r/ExperiencedDevs (Reddit)
-  - Local meetups
-- [ ] Identify 3-5 people who could serve as your "board" for the Phase 6 capstone
+**This curriculum teaches taste.**
 
-### Pick Your Stack
+If you just want to learn Dagster syntax, take a tutorial. If you want
+to develop the judgment that survives AI disruption, do this.
 
-Too many degrees of freedom in tool selection causes decision paralysis at exactly the moments where the tool doesn't matter.
+------------------------------------------------------------------------
 
-**If you don't have a strong preference, use this:**
+## Before You Commit: The Honest Trade-offs
 
-- **Language:** Python (FastAPI) or TypeScript (Express/Fastify)
-- **Database:** PostgreSQL
-- **Hosting:** Railway or Fly.io
-- **Load Testing:** k6
-- **Monitoring:** Prometheus + Grafana (free tier)
+**This curriculum costs 8-12 months of focused time.**
 
-If you already have a preferred stack, use it. The stack is not the point.
+### What you're NOT doing in those 8-12 months:
 
-### Set Up Your Progress Tracker
+-   Getting promoted to senior (immediate \$30-50K raise)
+-   Interviewing for FAANG (\$50-100K+ raise)
+-   Building a revenue-generating product
+-   Deepening specialization in your current domain
 
+### Opportunity cost is real
+
+-   6 months delayed promotion = \$15-25K lost
+-   This compounds over your career
+-   Be honest: can you afford to optimize for 5 years out vs. 1 year
+    out?
+
+### This makes sense if:
+
+-   Your current job has no senior engineers (self-teaching anyway)
+-   Your job is coasting (not learning much)
+-   You have conviction the AI thesis is right
+-   You can afford long-term optimization
+-   You want to be a founding engineer/CTO someday
+
+### This does NOT make sense if:
+
+-   You need a raise in the next 12 months
+-   You have great mentors at current job
+-   You're optimizing for immediate job market
+-   You don't actually believe LLMs will commoditize coding
+-   You prefer specialization over breadth
+
+**Be honest about which camp you're in.**
+
+------------------------------------------------------------------------
+
+## The Three Agreements
+
+Before anything else, agree to these. They override every checklist in
+this document.
+
+**1. Taste over completion** "I will not just check boxes. I will
+develop the judgment to spot ugly designs. If I'm completing exercises
+without my thinking changing, I will stop and go deeper."
+
+**2. Feedback over isolation** "I will get my work reviewed by others. I
+will calibrate my taste against theirs. I will not hide my work until
+it's 'ready.'"
+
+**3. Depth over breadth** "I will go deep enough to develop intuition,
+not just surface knowledge. I'd rather truly understand one system than
+superficially touch ten."
+
+**Sign this (seriously):** I, \_\_\_\_\_\_\_\_\_\_\_\_, commit to:
+
+Stopping if I'm checking boxes without my thinking changing Getting
+expert feedback even when my work feels "not ready yet" Going deeper
+rather than moving on when I don't understand Being honest about
+opportunity costs and whether this is right for me Date:
+\_\_\_\_\_\_\_\_\_\_\_\_ Share with accountability partner: Yes / No
+
+------------------------------------------------------------------------
+
+## The Taste Vocabulary
+
+**You can't develop taste without a language for it.** Use this rubric
+throughout the curriculum.
+
+### What "Ugly" Means (Concretely)
+
+An architecture is ugly when it has:
+
+  ------------------------------------------------------------------------
+  Smell               Definition                   Example
+  ------------------- ---------------------------- -----------------------
+  **Hidden coupling** Components that seem         Feature engineering and
+                      independent but fail         model serving share a
+                      together                     database connection
+                                                   pool
+
+  **Implicit          Works on the author's        Hardcoded file paths,
+  assumptions**       machine, breaks elsewhere    assumes unlimited
+                                                   memory
+
+  **Proportionality   Complex solutions to simple  Kubernetes for a
+  violations**        problems (or vice versa)     single-user app; no
+                                                   retry logic for a
+                                                   distributed system
+
+  **Time bombs**      Works today, guaranteed to   Loading all data into
+                      break at 10x                 memory, unbounded
+                                                   queries
+
+  **Operational       No way to know if it's       No metrics, no
+  blindness**         healthy without reading code structured logs, no
+                                                   alerts
+
+  **Cargo culting**   Using tools because "that's  Kafka for 100
+                      what you do"                 events/day;
+                                                   microservices for a
+                                                   2-person team
+
+  **Cleverness over   Optimized for writing, not   Nested comprehensions,
+  clarity**           reading                      magic numbers, no
+                                                   comments on "why"
+  ------------------------------------------------------------------------
+
+**When reviewing any system (yours or others), name the smells.**
+
+### What "Beautiful" Means (Concretely)
+
+An architecture is beautiful when it has:
+
+  ------------------------------------------------------------------------
+  Quality                Definition                 Example
+  ---------------------- -------------------------- ----------------------
+  **Proportional         Complexity matches the     Simple pipeline for
+  complexity**           problem's difficulty       simple data;
+                                                    distributed system
+                                                    only when needed
+
+  **Explicit             Decisions are documented   "We chose eventual
+  trade-offs**           with rationale             consistency because
+                                                    latency matters more
+                                                    than perfect accuracy
+                                                    here"
+
+  **Graceful             Fails partially, not       Serves cached
+  degradation**          totally                    predictions when model
+                                                    is down
+
+  **Observable by        You can understand system  Dashboards, structured
+  default**              health from outside        logs, meaningful
+                                                    alerts
+
+  **Deletable parts**    Components can be removed  Loose coupling, clear
+                         without cascading failures interfaces
+
+  **Obvious flow**       A new engineer can follow  Clear naming, linear
+                         the data path in 5 minutes pipeline, documented
+                                                    entry points
+  ------------------------------------------------------------------------
+
+------------------------------------------------------------------------
+
+## Timeline Overview (Honest Estimates)
+
+  ----------------------------------------------------------------------------
+  Phase         Duration        Weekly Hours          What You Build
+  ------------- --------------- --------------------- ------------------------
+  Phase 0:      1-2 weeks       8-10 hrs              Your support network
+  Setup &                                             
+  Community                                           
+
+  Phase 1A:     5-6 weeks       15-20 hrs             Working ML pipeline
+  Build                                               
+
+  Phase 1B:     4-5 weeks       15-20 hrs             Scaling report + cost
+  Scale & Break                                       analysis
+
+  Phase 1.5:    2-3 weeks       10 hrs                Gap analysis + honest
+  Taste                                               checkpoint
+  Calibration                                         
+
+  Phase 2: Go   3-4 weeks       15-20 hrs             Deep expertise pulled by
+  Deep                                                pain
+
+  Phase 3:      5-6 weeks       15-20 hrs             Production-hardened
+  Resilience                                          pipeline
+
+  Phase 4:      2-3 weeks       10 hrs                Pivot decision + user
+  Business                                            research
+  Context                                             
+
+  Phase 5: AI   3-4 weeks       10-15 hrs             LLM verification skills
+  Oversight                                           
+
+  Phase 6:      2-3 weeks       15-20 hrs             Real-world constraints
+  Capstone                                            
+
+  **Total**     **28-38 weeks** **Intense**           **Portfolio + Judgment**
+  ----------------------------------------------------------------------------
+
+**Sustainable alternative:** 12-15 months at 10 hrs/week
+
+**Buffer for life:** Add 20%. Real estimate: **34-46 weeks intensive**
+or **14-18 months sustainable**.
+
+### What "15-20 hrs/week intensive" Actually Means
+
+**Planned time:** - Coding/building: 10-15 hrs - Reading: 5-7 hrs -
+Total: 15-22 hrs
+
+**Unplanned time (that always happens):** - Debugging "why won't Docker
+start": 3-5 hrs/week - Re-reading chapters that didn't stick: 2-3
+hrs/week - Cohort coordination: 1-2 hrs/week - **Actual total: 21-32
+hrs/week**
+
+**If you work full-time:** - Work: 40 hrs - Curriculum: 25-30 hrs -
+Total: 65-70 hr weeks
+
+**This is not sustainable for 9 months.**
+
+**Realistic for full-time workers: 10 hrs/week = 18-24 months.**
+
+These estimates do NOT include monthly taste calibrations (\~4-6 hrs
+each) or the 6-month return exercise. Budget those separately.
+
+------------------------------------------------------------------------
+
+## Phase 0: Setup & Community (1-2 Weeks)
+
+**Goal:** Set up your environment and your feedback network. Neither is
+optional.
+
+### Your Technology Stack
+
+**Recommended (if no strong preferences):** - **Cloud:** Google Cloud
+Platform (free tier: \$300 credits) - **Orchestrator:** Dagster (better
+DX than Airflow for learning) - **Language:** Python 3.9+ -
+**Containers:** Docker - **Monitoring:** Prometheus + Grafana - **ML
+Tracking:** MLflow - **API:** FastAPI - **Load Testing:** Locust
+
+**If you have a preferred stack, use it. The stack is not the point.**
+
+### Community: A Gradient, Not a Gate
+
+You need feedback to develop taste. But "find 5 people for a 9-month
+commitment" is unrealistic advice. Instead, aim for the highest tier you
+can sustain:
+
+#### Tier 1: Minimum Viable (REQUIRED)
+
+-   [ ] **Work in public.** Create a GitHub repo for this curriculum.
+    Commit weekly.
+-   [ ] **Write as you learn.** Start a blog, dev.to, or even a
+    Twitter/X thread series documenting your journey. Writing forces
+    articulation, which forces clarity.
+-   [ ] **Engage in 2-3 communities weekly:**
+    -   [MLOps Community Slack](https://mlops.community/)
+    -   [r/MLOps](https://reddit.com/r/mlops)
+    -   [r/ExperiencedDevs](https://reddit.com/r/ExperiencedDevs)
+    -   Answer questions, ask questions, share what you're building
+
+**Why this works even solo:** Public work attracts feedback. People
+comment on repos, blog posts get responses, Slack messages start
+conversations. You're creating surface area for feedback without
+depending on anyone's commitment.
+
+#### Tier 2: Good (AIM FOR THIS)
+
+Everything in Tier 1, plus:
+
+-   [ ] **Find 1 accountability partner.** One person is sustainable. 5
+    is a project management nightmare.
+    -   Post: "Starting an MLOps learning curriculum. Looking for 1
+        partner for bi-weekly code reviews and architecture discussions.
+        \~1 hour every 2 weeks."
+    -   Try: MLOps Slack, dev Discord servers, local meetups, coworkers
+-   [ ] **Bi-weekly code review exchange.** You review theirs, they
+    review yours.
+
+#### Tier 3: Great (IF YOU CAN)
+
+Everything in Tier 2, plus ONE of:
+
+-   [ ] **Full cohort (3-5 people)** with weekly syncs
+    -   If you can make this happen, it's the highest-value option
+    -   Set rules: Miss two syncs = you're out
+    -   Demo days at end of each major phase
+-   [ ] **Active open source contribution** to Dagster, MLflow, or Feast
+    -   Realistic timeline: 1 contribution in first month (docs or small
+        bug fix)
+    -   Goal: See how maintainers think about design in PR reviews
+    -   Don't force this into 1-2 weeks --- let it happen alongside
+        Phase 1
+-   [ ] **Monthly mentor check-in** with a staff+ ML/infrastructure
+    engineer
+    -   Use [ADPList](https://adplist.org), cold email, or your network
+    -   Be specific: "Can I get 30 minutes monthly to review my
+        architecture decisions?"
+    -   Expect a 5-10% response rate on cold outreach --- send 20-30
+        messages
+
+**Key point:** Start at Tier 1 immediately. Upgrade to Tier 2-3 as
+opportunities arise. Don't wait for the perfect community to begin.
+
+### Environment Setup
+
+``` bash
+# Core tools
+brew install docker
+pip install dagster dagster-webserver dagster-gcp dagster-docker
+pip install scikit-learn pandas numpy mlflow
+pip install locust  # load testing
+pip install fastapi uvicorn
+
+# GCP setup
+gcloud auth login
+gcloud config set project YOUR_PROJECT
+gcloud services enable run.googleapis.com storage.googleapis.com
+
+# Monitoring (local for now)
+# Create docker-compose.yml with Prometheus + Grafana
+docker-compose up -d prometheus grafana
 ```
-## My Progress
 
-### Phase 0: Prerequisites & Setup
-- Start Date: ___________
-- Study Buddy / Mentor: ___________
-- Community Joined: ___________
-- Stack Chosen: ___________
-- Status: [ ] Not Started / [ ] In Progress / [ ] Complete
+### Architecture Decision Record (ADR) Practice
 
-### Phase 1: Scale & Distributed Systems
-- Start Date: ___________
-- Target Completion: ___________
-- Status: [ ] Not Started / [ ] In Progress / [ ] Complete
-- Key Insight: ___________
+Start this now. Use it throughout every phase.
 
-### Phase 2: Adversarial Thinking
-- Start Date: ___________
-- Target Completion: ___________
-- Status: [ ] Not Started / [ ] In Progress / [ ] Complete
-- Key Insight: ___________
+Create a `decisions/` folder in your repo. For every significant choice,
+write:
 
-### Phase 3: Resilience & Hardening
-- Start Date: ___________
-- Target Completion: ___________
-- Status: [ ] Not Started / [ ] In Progress / [ ] Complete
-- Key Insight: ___________
+``` markdown
+# ADR-001: Choosing Dagster Over Airflow
 
-### Phase 4: Product & Business Context
-- Start Date: ___________
-- Target Completion: ___________
-- Status: [ ] Not Started / [ ] In Progress / [ ] Complete
-- Key Insight: ___________
+## Status: Accepted
 
-### Phase 5: AI Oversight & Verification
-- Start Date: ___________
-- Target Completion: ___________
-- Status: [ ] Not Started / [ ] In Progress / [ ] Complete
-- Key Insight: ___________
+## Context
+Need an orchestrator for ML pipeline. Main options: Airflow, Dagster, Prefect.
 
-### Phase 6: The Capstone
-- Start Date: ___________
-- Target Completion: ___________
-- Status: [ ] Not Started / [ ] In Progress / [ ] Complete
-- Key Insight: ___________
+## Decision
+Dagster.
 
-### Reflection Questions (Answer Monthly)
-1. What surprised me this month?
-2. What failure taught me the most?
-3. What would I do differently on my last project?
-4. How has my judgment changed?
+## Rationale
+- Better local development experience (faster iteration)
+- Asset-based model fits ML workflows better than task-based
+- Growing adoption in MLOps community
+- Good documentation for learning
+
+## Trade-offs Accepted
+- Smaller community than Airflow (less Stack Overflow answers)
+- Less battle-tested at massive scale
+- May need to learn Airflow later for some jobs
+
+## What Would Change This Decision
+- If deploying to a company that's standardized on Airflow
+- If we needed 1000+ concurrent pipelines (Airflow's scheduler is more proven)
 ```
 
----
+You will write 15-25 ADRs over this curriculum. They are your taste
+development journal.
 
-## Phase 1: Scale & Distributed Systems (The SRE Role)
+------------------------------------------------------------------------
 
-**Duration:** 8-12 weeks
-**Goal:** Understand why code that works on your laptop fails for 10,000 users.
+## Create Your Progress Tracker
 
-> **Important:** Your URL shortener is the lab environment for the next 6 months. Phases 2 and 3 build directly on it. Design it knowing you'll later need to: add a second service (analytics), implement authentication, and perform a security audit. Slightly over-engineering is fine here.
+### My Curriculum Progress
 
-### Week 1-2: Study Real Failures
+**Start Date:** \_\_\_\_\_\_\_\_\_\_\_ **Community Tier:** 1 / 2 / 3
+**Accountability Partner:** \_\_\_\_\_\_\_\_\_\_\_ (or "Working in
+public at: \[URL\]")
 
-- [ ] Read 20+ incident reports on [Postmortems.app](https://postmortems.app)
-- [ ] Study case studies in the [Google SRE Book](https://sre.google/sre-book/table-of-contents/)
-- [ ] Focus areas: Database failures, cascading failures, cache invalidation bugs
-- [ ] Key question for each: *"What assumption did the engineers make that turned out wrong?"*
+### Phase Completion
 
-### Week 3-6: Theory Fundamentals
+-   [ ] Phase 0: Setup (Target: \_\_\_ )
+-   [ ] Phase 1A: Build (Target: \_\_\_ )
+-   [ ] Phase 1B: Scale (Target: \_\_\_ )
+-   [ ] Phase 1.5: Calibration (Target: \_\_\_ )
+-   [ ] Phase 2: Depth (Target: \_\_\_ )
+-   [ ] Phase 3: Resilience (Target: \_\_\_ )
+-   [ ] Phase 4: Business (Target: \_\_\_ )
+-   [ ] Phase 5: AI Oversight (Target: \_\_\_ )
+-   [ ] Phase 6: Capstone (Target: \_\_\_ )
 
-- [ ] Read *Designing Data-Intensive Applications* by Martin Kleppmann (active reading, take notes)
-- [ ] Don't skip: Chapters 5-9 (Replication, Partitioning, Transactions, Distributed Systems)
-- [ ] Understand the CAP Theorem and Fallacies of Distributed Computing
-- [ ] Build mental models of: eventual consistency, split-brain scenarios, thundering herd problem
+### ADR Count: \_\_\_
 
-### Week 7-12: The Lab Exercise
+### Blog Posts Published: \_\_\_
 
-**Project: Build a URL Shortener and Find Its Breaking Points**
+### Architecture Reviews Given: \_\_\_
 
-#### Starting Schema
+### Architecture Reviews Received: \_\_\_
 
-Don't overthink this. Start here and evolve:
+#### Monthly Reflection (Answer end of each month)
 
-```sql
-CREATE TABLE urls (
-    id SERIAL PRIMARY KEY,
-    short_code VARCHAR(10) UNIQUE NOT NULL,
-    original_url TEXT NOT NULL,
-    created_at TIMESTAMP DEFAULT NOW(),
-    user_id INTEGER,          -- for Phase 2 (auth)
-    click_count INTEGER DEFAULT 0
-);
+1.  What surprised me this month?
+2.  What failure taught me the most?
+3.  Name one "ugly" smell I can now spot that I couldn't before.
+4.  What would I do differently on my last project?
+5.  Am I developing *intuition* or just *knowledge*?
 
-CREATE TABLE clicks (
-    id SERIAL PRIMARY KEY,
-    url_id INTEGER REFERENCES urls(id),
-    clicked_at TIMESTAMP DEFAULT NOW(),
-    referrer TEXT,
-    user_agent TEXT
-);
+------------------------------------------------------------------------
+
+## Community Health Check
+
+Add this to the end of each phase:
+
+### Community Check (End of Phase \_\_\_)
+
+-   [ ] Tier 1: Have I posted work publicly? Getting any engagement?
+-   [ ] Can I upgrade to Tier 2? (If not, why? Do I need to be more
+    active?)
+-   [ ] If solo still: Is isolation hurting my learning? Evidence:
+    \_\_\_
+-   [ ] Have I gotten feedback from at least 1 other person this phase?
+
+------------------------------------------------------------------------
+
+## Phase 1A: Build a Working ML Pipeline (5-6 Weeks)
+
+**Goal:** Build a complete ML pipeline from scratch AND develop your
+first instincts about what makes a system elegant vs. ugly.
+
+### Week 1-2: Study Before You Build
+
+#### Study Failures
+
+**Read 10 incident reports on ML system failures:** - Search: "Uber
+Michelangelo postmortem", "Netflix ML incident", "Spotify recommendation
+outage" - Also: Google "site:blog.\[company\].com ML pipeline failure"
+for various companies - Good aggregator: SRE Weekly, Incident.io blog
+
+For each incident, document using the taste vocabulary:
+
+``` markdown
+# Incident: [Company] [System] Failure
+
+**What happened:** [1-2 sentences]
+**Root cause:** [Technical cause]
+**Taste smell:** [Which "ugly" pattern from the rubric?]
+**What assumption broke at scale?**
+**Could this have been predicted from the architecture alone?**
 ```
 
-#### Success Criteria Before Load Testing
+#### Study Excellence
 
-Your app should handle:
+**Pick 3 ML systems known for elegance:** - Uber's Michelangelo
+platform - Netflix's model serving architecture - Spotify's feature
+platform - (Or substitute: LinkedIn's Pro-ML, Airbnb's Bighead, Google's
+TFX)
 
-- **Create:** `POST /shorten` — accepts a URL, returns a short code
-- **Read:** `GET /:code` — redirects to the original URL
-- **Analytics:** `GET /:code/stats` — returns click count and basic analytics
-- **List:** `GET /urls` — returns user's URLs (for Phase 2 auth)
+For each, document using the "beautiful" rubric:
 
-#### Step-by-Step
+``` markdown
+# Beautiful System: [Name]
 
-1. Build the URL shortener with the above functionality
-2. Deploy it to real hosting (Railway, Fly.io — **NOT localhost**)
-3. Load test with k6 or Locust:
-   - 10 users → 100 → 1,000 → 10,000
-   - Document what breaks at each tier
-4. Fix the first bottleneck (probably DB connection pool)
-5. Test again — find the NEXT bottleneck (CPU? Memory? Network?)
-6. Repeat until you've identified and fixed 3 different scaling issues
+**Architecture overview:** [Draw it — pen and paper is fine]
 
-#### Database Deep Dive Exercise
+**Which "beautiful" qualities does it have?**
+- Proportional complexity? How?
+- Explicit trade-offs? Where documented?
+- Observable by default? What signals?
+- Obvious flow? Could a new hire follow it?
 
-Once your app is running:
+**What they chose NOT to do:**
+- [This is often more revealing than what they did]
 
-1. Seed your database with 10M rows of URL data
-2. Write a reporting query: "Top 100 most-clicked URLs this week"
-3. Run `EXPLAIN ANALYZE` on the query
-4. Optimize from >10s to <100ms
-5. Document: What index did you add? Why did it help? What are the write-performance trade-offs?
+**What constraints forced the elegant solution:**
+- [Beautiful systems are usually born from constraints, not freedom]
 
-#### Deliverable
+**One pattern I want to try in my own pipeline:**
+[Description]
+```
 
-- [ ] GitHub repo with the application
-- [ ] "Scaling Report" documenting:
-  - Original breaking point (e.g., "Failed at 200 concurrent users")
-  - Each bottleneck discovered (connection pool exhaustion, CPU saturation, etc.)
-  - How you fixed each one (connection pooling, caching, async processing)
-  - Cost implications ("$50/month for 1K users, $500/month for 100K users")
-  - Performance graphs showing before/after metrics
-  - Database optimization results (query plan before/after, execution time improvement)
+**ADR opportunity:** After this study, write ADR-002 about a design
+pattern you want to adopt and why.
 
-**The Lesson:** Systems don't just "scale" or "not scale" — they have cascading bottlenecks. Understanding the cascade is the skill.
+### Week 3-4: Theory Fundamentals
 
-### Phase 1 Checkpoint
+**Read *Designing Data-Intensive Applications* Chapters 5-9:** - Chapter
+5 (Replication): When do you need it? What can go wrong? - Chapter 6
+(Partitioning): How to split data. Relevance to feature stores. -
+Chapter 7 (Transactions): What guarantees do you actually need? -
+Chapter 8 (Distributed Systems): Failure modes you must internalize. -
+Chapter 9 (Consistency): Eventual vs. strong. When each matters.
 
-Before moving to Phase 2, verify:
+**After each chapter, write a 1-paragraph summary:** "What does this
+mean for my ML pipeline?"
 
-- [ ] Your URL shortener is deployed and running on real hosting
-- [ ] You can explain your 3 bottlenecks to a peer without looking at notes
-- [ ] Your app has the basic structure to support adding auth and a second service
+**Understand these concepts well enough to explain them to your
+accountability partner or in a blog post:** - CAP theorem (and why it's
+usually misunderstood) - Backpressure and flow control - Batch
+vs. stream processing trade-offs - Feature store patterns (online
+vs. offline)
 
-**If Phase 1 doesn't click, that's okay.** You've still learned more about production engineering than most bootcamps teach. Evaluate whether to continue at full intensity or adjust scope.
+### Week 5-6: Build the Pipeline
 
----
+#### Project: Weather Prediction ML Pipeline
 
-## Phase 2: Adversarial Thinking (The CISO Role)
+**What you're building:**
 
-**Duration:** 6-10 weeks
-**Goal:** Stop thinking like a builder and start thinking like a breaker.
+``` text
+Data Source (Weather API: OpenWeather or NOAA)
+    ↓
+Ingestion (Dagster asset)
+    ↓
+Storage (GCS bucket — raw parquet files)
+    ↓
+Feature Engineering (Dagster asset — temporal features, rolling averages)
+    ↓
+Model Training (scikit-learn, tracked with MLflow)
+    ↓
+Model Registry (MLflow model registry)
+    ↓
+Serving (FastAPI endpoint on Cloud Run)
+    ↓
+Monitoring (Prometheus metrics + Grafana dashboard)
+```
 
-### Week 1-3: Security Fundamentals
+**Data Ingestion:**
 
-- [ ] Master the [OWASP Top 10](https://owasp.org/www-project-top-ten/) (understand each, don't just memorize)
-- [ ] Complete [Cryptopals Crypto Challenges](https://cryptopals.com) Set 1
-- [ ] Stretch goal: Complete Set 2 (if you're ahead of schedule)
-- [ ] Learn why "rolling your own crypto" fails spectacularly
+``` python
+from dagster import asset, AssetExecutionContext
+import requests
+import pandas as pd
+import os
 
-> **Note on Cryptopals:** Set 1 alone can take 2-4 weeks. If it's consuming your entire Phase 2 timeline, switch to studying real-world crypto failures instead:
-> - Heartbleed (OpenSSL buffer over-read)
-> - The Debian weak key incident (broken PRNG)
-> - PlayStation 3 ECDSA fail (nonce reuse)
-> - Padding oracle attacks in practice
->
-> The goal is understanding *why not to roll your own crypto*, not becoming a cryptographer.
+@asset
+def raw_weather_data(context: AssetExecutionContext) -> pd.DataFrame:
+    """Fetch weather data from OpenWeather API.
+    
+    Fetches historical weather data and stores as parquet.
+    Currently loads all data into memory — this is a known
+    limitation that will break at ~1M rows (see Phase 1B).
+    
+    We're accepting this limitation for now because:
+    - Easier to build and test with small datasets
+    - GCP free tier covers this usage
+    - Phase 1B will force us to fix it
+    """
+    df = fetch_weather_data(api_key=os.environ["OPENWEATHER_KEY"])
+    
+    # Store to GCS
+    df.to_parquet("gs://your-bucket/raw/weather.parquet")
+    
+    context.log.info(f"Ingested {len(df)} rows")
+    return df
 
-### Week 4-6: Threat Modeling Exercise
 
-**Project: STRIDE Analysis of Your URL Shortener**
+def fetch_weather_data(api_key: str) -> pd.DataFrame:
+    """Fetch data from OpenWeather API.
+    
+    Note: No retry logic yet. Will add in Phase 3.
+    """
+    response = requests.get(
+        "https://api.openweathermap.org/data/2.5/forecast",
+        params={"appid": api_key, "units": "metric"},
+        timeout=10
+    )
+    response.raise_for_status()
+    return pd.DataFrame(response.json()["list"])
+```
 
-For your Phase 1 URL shortener, perform a STRIDE analysis:
+**Feature Engineering:**
 
-| Threat | Question |
-|--------|----------|
-| **S**poofing | Can I pretend to be another user? |
-| **T**ampering | Can I modify someone else's URLs? |
-| **R**epudiation | Can I deny creating a malicious short URL? |
-| **I**nformation Disclosure | Can I enumerate all URLs in the system? |
-| **D**enial of Service | Can I crash the service with malformed input? |
-| **E**levation of Privilege | Can I access admin functions without authorization? |
+``` python
+@asset
+def weather_features(
+    context: AssetExecutionContext,
+    raw_weather_data: pd.DataFrame
+) -> pd.DataFrame:
+    """Engineer features for weather prediction.
+    
+    Creates temporal features and rolling statistics.
+    
+    Note: Rolling windows assume sorted, continuous timestamps.
+    If data has gaps, rolling calculations will be misleading.
+    This is acceptable for now (weather data is continuous), but
+    would need handling for sparse data. See ADR-003.
+    """
+    df = raw_weather_data.copy()
+    
+    # Temporal features
+    df["hour"] = df["timestamp"].dt.hour
+    df["day_of_week"] = df["timestamp"].dt.dayofweek
+    df["month"] = df["timestamp"].dt.month
+    
+    # Rolling statistics (7-day window = 168 hours)
+    df["temp_rolling_mean"] = df["temperature"].rolling(window=168).mean()
+    df["temp_rolling_std"] = df["temperature"].rolling(window=168).std()
+    
+    # Handle NaN from rolling window
+    # Dropping rows is simple but loses data. Alternative would be
+    # forward-fill or use smaller window for early rows.
+    # For this use case, dropping is acceptable.
+    df = df.dropna()
+    
+    df.to_parquet("gs://your-bucket/features/weather_features.parquet")
+    context.log.info(
+        f"Generated {len(df)} feature rows from {len(raw_weather_data)} raw rows"
+    )
+    return df
+```
 
-For EACH threat:
+**Model Training:**
 
-1. **Attack vector** — How would you exploit this?
-2. **Mitigation** — How would you fix it?
-3. **Residual risk** — What's still vulnerable after the fix?
+``` python
+@asset
+def trained_model(
+    context: AssetExecutionContext,
+    weather_features: pd.DataFrame
+):
+    """Train weather prediction model and log to MLflow.
+    
+    Uses RandomForest as baseline. Model choice is deliberate:
+    - Handles non-linear relationships
+    - Robust to feature scaling
+    - Interpretable feature importances
+    
+    See ADR-004 for why we chose RF over gradient boosting.
+    
+    Trade-off: RF is slower than linear models but more accurate
+    for our non-linear weather patterns.
+    """
+    import mlflow
+    from sklearn.ensemble import RandomForestRegressor
+    from sklearn.model_selection import train_test_split
+    from sklearn.metrics import mean_absolute_error
+    
+    feature_cols = [
+        "temperature", "humidity", "pressure",
+        "hour", "day_of_week", "month",
+        "temp_rolling_mean", "temp_rolling_std"
+    ]
+    
+    X = weather_features[feature_cols]
+    y = weather_features["next_day_temp"]
+    
+    # Time series: no shuffle
+    X_train, X_test, y_train, y_test = train_test_split(
+        X, y, test_size=0.2, shuffle=False
+    )
+    
+    with mlflow.start_run():
+        model = RandomForestRegressor(n_estimators=100, random_state=42)
+        model.fit(X_train, y_train)
+        
+        # Evaluate
+        predictions = model.predict(X_test)
+        mae = mean_absolute_error(y_test, predictions)
+        
+        mlflow.log_metric("mae", mae)
+        mlflow.log_param("n_estimators", 100)
+        mlflow.sklearn.log_model(model, "weather_model")
+        
+        context.log.info(f"Model trained. MAE: {mae:.2f}")
+    
+    return model
+```
 
-#### Deliverable
+**Model Serving:**
 
-- [ ] Threat Model document (one page per threat category)
-- [ ] At least 3 implemented mitigations in your codebase
-- [ ] Honest assessment: Proof you can still exploit 1 remaining vulnerability (security is about understanding limits, not claiming perfection)
+``` python
+from fastapi import FastAPI, HTTPException
+from pydantic import BaseModel
+import mlflow.pyfunc
+import logging
 
-### Week 7-10: Practical Exploitation
+logger = logging.getLogger(__name__)
 
-- [ ] Set up the [OWASP Juice Shop](https://owasp.org/www-project-juice-shop/) (intentionally vulnerable application)
-- [ ] Complete the guided tour
-- [ ] Successfully execute at least 15 challenges including:
-  - SQL Injection
-  - Cross-Site Scripting (XSS)
-  - Broken Authentication
-  - Sensitive Data Exposure
-- [ ] Focus: Don't just complete challenges — understand *WHY* each vulnerability exists
+app = FastAPI()
 
-**The Lesson:** Security isn't a checklist — it's a mindset of "what did I assume that could be violated?"
+# Load model once at startup — acceptable for single-model serving.
+# For multi-model or frequent reloads, use a model server (Seldon, BentoML).
+# See ADR-005 for this decision.
+try:
+    model = mlflow.pyfunc.load_model("models:/weather_model/Production")
+except Exception as e:
+    logger.error(f"Failed to load model: {e}")
+    model = None
 
----
 
-## Phase 3: Resilience & Hardening (The "Blue Team" Role)
+class PredictionRequest(BaseModel):
+    temperature: float
+    humidity: float
+    pressure: float
+    hour: int
+    day_of_week: int
+    month: int
+    temp_rolling_mean: float
+    temp_rolling_std: float
 
-**Duration:** 4-6 weeks
-**Goal:** Design systems that fail gracefully instead of crashing catastrophically.
+
+@app.post("/predict")
+def predict(request: PredictionRequest):
+    if model is None:
+        raise HTTPException(503, "Model not loaded")
+    
+    features = [list(request.dict().values())]
+    prediction = model.predict(features)
+    return {"prediction": float(prediction[0])}
+
+
+@app.get("/health")
+def health():
+    """Health check endpoint.
+    
+    Current implementation only checks if model loaded.
+    In production, should also check:
+    - Can the model actually make predictions? (not just loaded)
+    - Is the database reachable?
+    - Are dependencies healthy?
+    
+    See Phase 3 for a more robust health check.
+    """
+    return {
+        "status": "healthy" if model is not None else "degraded",
+        "model_loaded": model is not None
+    }
+```
+
+**Basic Monitoring:**
+
+``` python
+# Add to your FastAPI app
+from prometheus_client import Counter, Histogram, generate_latest
+from starlette.responses import Response
+import time
+
+prediction_count = Counter(
+    "predictions_total", 
+    "Total predictions made",
+    ["status"]
+)
+prediction_latency = Histogram(
+    "prediction_latency_seconds",
+    "Prediction latency",
+    buckets=[0.01, 0.05, 0.1, 0.25, 0.5, 1.0, 2.5]
+)
+
+@app.post("/predict")
+def predict(request: PredictionRequest):
+    start = time.time()
+    try:
+        if model is None:
+            raise HTTPException(503, "Model not loaded")
+        features = [list(request.dict().values())]
+        result = model.predict(features)
+        prediction_count.labels(status="success").inc()
+        return {"prediction": float(result[0])}
+    except Exception as e:
+        prediction_count.labels(status="error").inc()
+        raise
+    finally:
+        prediction_latency.observe(time.time() - start)
+
+@app.get("/metrics")
+def metrics():
+    return Response(generate_latest(), media_type="text/plain")
+```
+
+#### Deliverable Phase 1A:
+
+-   [ ] GitHub repo with complete pipeline (well-documented)
+-   [ ] Working end-to-end: data in → predictions out
+-   [ ] Deployed to GCP (even if just Cloud Run + GCS)
+-   [ ] Basic Grafana dashboard (prediction count, latency, errors)
+-   [ ] Can handle 10 requests/second
+-   [ ] At least 2 ADRs written (orchestrator choice, model choice)
+-   [ ] Blog post or public write-up: "What I built and what I'd change"
+
+------------------------------------------------------------------------
+
+### Phase 1A Reflection (Do Before Moving On)
+
+**This is critical. Don't skip.**
+
+``` markdown
+# Phase 1A Reflection
+
+**What was harder than expected?**
+[Be specific]
+
+**What taste smells (from the rubric) exist in my own pipeline?**
+- Hidden coupling: [yes/no - where?]
+- Implicit assumptions: [yes/no - where?]
+- Time bombs: [yes/no - where?]
+- Operational blindness: [yes/no - where?]
+- Proportionality violations: [yes/no - where?]
+- Cargo culting: [yes/no - where?]
+
+**What would I do differently if I started over?**
+[Not "I'd write better code" but specific architectural decisions]
+
+**What am I most uncertain about in my architecture?**
+[What keeps you up at night?]
+
+**Am I still excited about this, or am I forcing it?**
+[ ] Excited - let's keep going
+[ ] Neutral - it's fine
+[ ] Forcing it - might need to reconsider
+
+**Can I explain my architecture WITHOUT looking at code?**
+[ ] Yes - I can whiteboard it from memory
+[ ] Partially - I remember the flow but not details
+[ ] No - I need to look at code
+```
+
+If you answered "Forcing it" or "No" to the last question, pause and
+reflect:
+
+-   Maybe you need to rebuild Phase 1A with different decisions
+-   Maybe you need more feedback before continuing
+-   Maybe self-directed learning isn't working for you (that's okay)
+
+------------------------------------------------------------------------
+
+## Phase 1B: Scale It Until It Breaks (4-5 Weeks)
+
+**Goal:** Discover where your assumptions fail under pressure. The
+breaks teach more than the building.
+
+### Week 1-2: Systematic Stress Testing
+
+#### Test 1: Data Volume
+
+  ------------------------------------------------------------------------
+  Scale   Expected Behavior  Actual Behavior  What Broke  Time to Process
+  ------- ------------------ ---------------- ----------- ----------------
+  10K     Works fine                                      
+  rows                                                    
+
+  100K    Should work                                     
+  rows                                                    
+
+  1M rows Might struggle                                  
+
+  10M     Will break                                      
+  rows                                                    
+  ------------------------------------------------------------------------
+
+``` bash
+# Generate synthetic data at increasing scales
+python scripts/generate_data.py --rows 10000
+python scripts/generate_data.py --rows 100000
+python scripts/generate_data.py --rows 1000000
+python scripts/generate_data.py --rows 10000000
+
+# For each: Run the full pipeline. Time it. Note memory usage.
+# What breaks first?
+# - Pandas memory errors?
+# - GCS upload timeouts?
+# - Dagster worker crashes?
+# - Feature engineering becomes impossibly slow?
+```
+
+#### Test 2: API Load
+
+``` python
+# locustfile.py
+from locust import HttpUser, task, between
+
+class WeatherUser(HttpUser):
+    wait_time = between(0.1, 0.5)
+    
+    @task
+    def predict(self):
+        self.client.post("/predict", json={
+            "temperature": 72.0,
+            "humidity": 45.0,
+            "pressure": 1013.0,
+            "hour": 14,
+            "day_of_week": 2,
+            "month": 6,
+            "temp_rolling_mean": 70.0,
+            "temp_rolling_std": 5.0
+        })
+
+# Ramp: 10 → 100 → 500 → 1000 users
+locust -f locustfile.py --host http://your-api-url
+
+# At each level, record:
+# - p50, p95, p99 latency
+# - Error rate
+# - What the Grafana dashboard shows
+```
+
+  ---------------------------------------------------------------------------
+  Concurrent Users p50 Latency  p95 Latency  p99 Latency  Error Rate  Notes
+  ---------------- ------------ ------------ ------------ ----------- -------
+  10                                                                  
+
+  100                                                                 
+
+  500                                                                 
+
+  1000                                                                
+  ---------------------------------------------------------------------------
+
+#### Test 3: Concurrent Pipeline Runs
+
+``` bash
+# Trigger 5 → 10 → 20 Dagster runs simultaneously
+# What happens?
+# - Resource contention?
+# - Database connection pool exhaustion?
+# - GCS rate limiting?
+# - Do runs interfere with each other?
+```
+
+### Week 3-4: Fix Bottlenecks
+
+For each bottleneck, document in this format:
+
+``` markdown
+# Bottleneck: [Name]
+
+**Discovery:** How I found it (metrics, errors, observation)
+**Scale it appeared:** [e.g., "At 1M rows" or "At 500 concurrent users"]
+**Root cause:** [Technical explanation]
+**Taste smell:** [Which "ugly" pattern from the rubric]
+
+**Fix applied:**
+[Description + code snippet]
+
+**Performance impact:**
+- Before: [metric]
+- After: [metric]
+- Improvement: [X%]
+
+**Cost implication:**
+- Before fix, at 100K users/month: $___/month
+- After fix, at 100K users/month: $___/month
+
+**ADR written:** ADR-00X
+```
+
+**Minimum:** Fix 3 bottlenecks with full documentation.
+
+**Example bottleneck fixes:**
+
+``` python
+# Bottleneck 1: Memory exhaustion at 1M rows
+
+# Before (loads all into memory):
+df = pd.read_parquet("gs://bucket/data.parquet")
+processed = process_data(df)
+
+# After (chunked processing):
+def process_in_chunks(file_path, chunk_size=100_000):
+    for chunk in pd.read_parquet(file_path, chunksize=chunk_size):
+        yield process_data(chunk)
+
+# Impact: Can now handle 10M+ rows
+# Cost: Same (actually lower - smaller instance needed)
+
+# Bottleneck 2: Database connection pool exhaustion
+
+# Before: Default SQLAlchemy settings (pool_size=5)
+engine = create_engine(connection_string)
+
+# After: Tuned for concurrent access
+engine = create_engine(
+    connection_string,
+    pool_size=20,           # More connections
+    max_overflow=10,        # Burst capacity
+    pool_pre_ping=True,     # Verify connections before use
+    pool_recycle=3600       # Recycle connections hourly
+)
+
+# Impact: Can handle 50+ concurrent pipeline runs
+# Cost: Same (connection pool is free, just configuration)
+```
+
+### Week 4-5: Cost Analysis (Using Free Tier Data)
+
+``` markdown
+# Cost Analysis
+
+### Current usage (from GCP Console → Billing → Reports)
+
+**Actual usage this week:**
+| Resource | Usage | Cost (if not free tier) |
+|----------|-------|------------------------|
+| Cloud Run requests | X | $Y |
+| Cloud Run compute time | X hours | $Y |
+| GCS storage | X GB | $Y |
+| GCS operations | X ops | $Y |
+| Networking (egress) | X GB | $Y |
+| **Total if paid** | | **$___/week** |
+
+**Time on free tier:** ___ weeks
+**Projected annual cost at current usage:** $___ per year
+
+### Projected costs at scale
+
+**Use [GCP Pricing Calculator](https://cloud.google.com/products/calculator)**
+
+| Scale | Requests/Day | Data Processed | Storage | Estimated Cost/Month |
+|-------|-------------|----------------|---------|---------------------|
+| Current | 100 | 1 GB | 10 GB | $0 (free tier) |
+| 100 users | 1K | 10 GB | 100 GB | ~$15 |
+| 1K users | 10K | 100 GB | 1 TB | ~$150 |
+| 10K users | 100K | 1 TB | 10 TB | ~$1,500 |
+| 100K users | 1M | 10 TB | 100 TB | ~$15,000 |
+
+### Where costs come from
+
+**Biggest cost driver:** [Compute? Storage? Network?]
+
+**Cost per user:** 
+- At 1K users: $0.15 per user per month
+- At 100K users: $0.15 per user per month
+- (Good sign if it stays flat - means you're scaling efficiently)
+
+### Architecture cost comparison
+
+**Current "naive" architecture:**
+- Feature computation: Real-time (on every request)
+- Storage class: GCS Standard for everything
+- Instances: Always warm (min instances = 2)
+- **Estimated cost at 10K users:** $___
+
+**Optimized architecture:**
+- Feature computation: Pre-computed batch job
+- Storage class: Nearline for old data, Standard for recent
+- Instances: min instances = 1, accept some cold starts
+- **Estimated cost at 10K users:** $___
+- **Savings:** ___% ($___/month)
+
+**Trade-offs in optimized version:**
+- Cold start latency (acceptable for our use case)
+- Features not real-time (acceptable for daily predictions)
+- Slower access to historical data (rarely needed)
+
+**ADR: Architecture Cost Optimization**
+```
+
+#### Deliverable Phase 1B:
+
+-   [ ] Scaling report with 3+ bottlenecks documented
+-   [ ] Load test results with graphs
+-   [ ] Cost analysis with projections (using free tier data)
+-   [ ] Updated Grafana dashboard
+-   [ ] ADRs for each major fix decision
+-   [ ] Blog post: "How my ML pipeline broke at scale (and how I fixed
+    it)"
+
+------------------------------------------------------------------------
+
+## Phase 1.5: Taste Calibration --- The Honest Checkpoint (2-3 Weeks)
+
+**Goal:** Calibrate your taste against experts. Determine if you're
+developing judgment or just completing exercises.
+
+**This is the most important exercise in the entire curriculum.**
+
+### Week 1: Get Expert Feedback
+
+**Find 3 people to review your pipeline:** - **Easiest:** Post in MLOps
+Slack with link to your (public) repo - **Good:** Your accountability
+partner + someone from a community - **Best:** A staff+ engineer (use
+ADPList, cold outreach, or your network) - **Realistic:** You may only
+get 1-2 reviews. That's fine. Quality \> quantity. Send this message:
+
+``` text
+I built this ML pipeline as a learning project (link to repo + architecture diagram).
+Could you spend 15 minutes reviewing it?
+
+Specific questions:
+1. What will break first when this serves 10x more traffic?
+2. What's the ugliest part of this architecture?
+3. If you had to maintain this at 2 AM, what would frustrate you?
+4. What's one pattern I should learn from?
+```
+
+BEFORE sending: Write down YOUR predictions for what they'll say.
+
+``` markdown
+# My Predictions (BEFORE Expert Feedback)
+
+**Reviewer 1:**
+- What will break: ___
+- Ugliest part: ___
+- 2 AM frustration: ___
+- Pattern to learn: ___
+
+**Reviewer 2:**
+- What will break: ___
+- Ugliest part: ___
+- 2 AM frustration: ___
+- Pattern to learn: ___
+
+**Reviewer 3:**
+- What will break: ___
+- Ugliest part: ___
+- 2 AM frustration: ___
+- Pattern to learn: ___
+```
+
+### Week 2: Gap Analysis
+
+``` markdown
+# Taste Gap Analysis
+
+### Reviewer 1: [Name/Source]
+
+| My Prediction | Their Actual Feedback | Match? | Why I Missed It |
+|--------------|----------------------|--------|-----------------|
+| Will break: ___ | Will break: ___ | ✓/✗ | |
+| Ugly: ___ | Ugly: ___ | ✓/✗ | |
+| 2 AM: ___ | 2 AM: ___ | ✓/✗ | |
+| Pattern: ___ | Pattern: ___ | ✓/✗ | |
+
+### Reviewer 2: [Name/Source]
+[Same table]
+
+### Reviewer 3: [Name/Source]
+[Same table]
+
+### Aggregate Accuracy
+- Predictions matched: ___/12 (___%)
+- Categories I'm good at predicting: ___
+- Categories I'm blind to: ___
+
+### What This Tells Me About My Taste
+
+**I'm good at spotting:**
+[E.g., "I correctly predicted the database bottleneck"]
+
+**I'm blind to:**
+[E.g., "I completely missed operational concerns like monitoring gaps"]
+
+**My mental model is missing:**
+[E.g., "I don't think enough about maintenance - I focus on 'does it work' not 'can someone else maintain it'"]
+
+**Specific things I'll change:**
+1. ___
+2. ___
+3. ___
+```
+
+### Week 3: Deep Study of One Beautiful System
+
+**Pick ONE ML platform to study deeply:** - Uber Michelangelo - Netflix
+model serving - Spotify feature platform - LinkedIn Pro-ML - (Pick the
+one most relevant to what you're building) **Read EVERYTHING about
+it:** - Original blog post(s) - Follow-up posts about evolution -
+Conference talks (YouTube) - GitHub repos if available - Design docs if
+public Document:
+
+``` markdown
+# Deep Study: [System Name]
+
+### Architecture (draw it)
+[Diagram - hand-drawn is fine, upload photo]
+
+### Beautiful Qualities (from rubric)
+- **Proportional complexity:** [how?]
+- **Explicit trade-offs:** [where documented?]
+- **Observable by default:** [what signals?]
+- **Obvious flow:** [could I follow it?]
+- **Graceful degradation:** [examples?]
+- **Deletable parts:** [how decoupled?]
+
+### What They Chose NOT to Do
+[Often more revealing than what they built]
+
+### Constraints That Forced Elegance
+[Beautiful systems are usually born from constraints]
+- Scale constraint: ___
+- Time constraint: ___
+- Team constraint: ___
+- Cost constraint: ___
+
+### How My Pipeline Compares
+| Aspect | Their System | My Pipeline | Gap |
+|--------|-------------|-------------|-----|
+| Feature serving | Pre-computed, cached | Real-time computation | Performance hit |
+| Monitoring | Custom metrics, dashboards | Basic Prometheus | Less visibility |
+| Deployment | Blue-green, canary | Direct deploy | More risk |
+
+### Three Things I'm Changing in My Pipeline
+1. [Specific change based on this study]
+2. [Specific change based on this study]
+3. [Specific change based on this study]
+
+### ADR: Lessons from [System Name]
+[Write formal ADR about what you're adopting and why]
+```
+
+------------------------------------------------------------------------
+
+### THE HONEST CHECKPOINT
+
+Answer these honestly. Write them down. Show them to your accountability
+partner.
+
+``` markdown
+# Honest Checkpoint
+
+### 1. Can I explain my pipeline's architecture WITHOUT looking at code?
+[ ] Yes — I can whiteboard it from memory
+[ ] Partially — I remember the flow but not the details
+[ ] No — I need to look at the code
+
+### 2. Did the expert feedback SURPRISE me significantly?
+[ ] Yes — they found things I never considered
+[ ] Somewhat — I knew about some issues but not all
+[ ] No — I predicted most of their feedback
+
+### 3. Can I name 3 things I'd do differently WITHOUT referencing notes?
+[ ] Yes (list them):
+    1. ___
+    2. ___
+    3. ___
+[ ] I can name 1-2
+[ ] No
+
+### 4. Has my INTUITION about designs changed, or just my KNOWLEDGE?
+[ ] Intuition — I "feel" when something is off before I can articulate why
+[ ] Knowledge — I know the rules but apply them mechanically
+[ ] Unsure
+
+### 5. When I look at a new pipeline repo, can I predict problems?
+[ ] Yes — I can guess 3+ issues before reading the code
+[ ] Somewhat — I can guess 1-2 obvious ones
+[ ] No — I need to read the code first
+
+### 6. Do I care about this work, or am I just checking boxes?
+[ ] Care — I'm excited to keep going
+[ ] Neutral — It's fine, educational
+[ ] Checking boxes — I'm doing it because I "should"
+```
+
+#### Interpreting Your Answers
+
+  -----------------------------------------------------------------------
+  Pattern            Diagnosis              Prescription
+  ------------------ ---------------------- -----------------------------
+  Yes, No, Yes,      You're developing      Keep going. You're on the
+  Intuition, Yes,    taste. Proceed to      right track.
+  Care               Phase 2.               
+
+  Partially,         Normal progress.       Proceed, but slow down. Go
+  Somewhat, 1-2,     You're learning but    deeper on each phase.
+  Knowledge,         not yet intuitive.     Consider upgrading to Tier
+  Somewhat, Neutral                         2/3 community.
+
+  No, Yes, No,       You're completing      STOP. See Plan B below.
+  Knowledge, No,     exercises, not         
+  Checking boxes     developing taste.      
+  -----------------------------------------------------------------------
+
+#### Plan B (If You Scored Poorly)
+
+If you got the third pattern above, this curriculum isn't working for
+you. **That's okay.**
+
+**Options:**
+
+1.  **Rebuild Phase 1 from scratch with different decisions**
+    -   Pick a different domain (not weather)
+    -   Make different architectural choices
+    -   Focus on understanding WHY, not just making it work
+2.  **Get a job with strong senior engineers**
+    -   Some people develop taste better through apprenticeship
+    -   No shame in this --- it's often faster and more effective
+    -   Self-directed learning isn't for everyone
+3.  **Find a paid mentor for structured 1-on-1 teaching**
+    -   If you have budget, this accelerates learning
+    -   More effective than struggling alone
+4.  **Take a break, come back in 3 months**
+    -   Sometimes you need distance to consolidate learning
+    -   Work on other things, let this percolate
+5.  **Accept you might be a specialist, not a generalist**
+    -   That's totally fine
+    -   Focus on getting really good at one thing
+    -   Depth \> breadth for some career paths
+
+**There is no shame in any of these paths. Recognizing when something
+isn't working is also taste.**
+
+------------------------------------------------------------------------
+
+## Phase 2: Go Deep (3-4 Weeks)
+
+**Goal:** Go deep on something that hurt you in Phase 1. Surface
+knowledge → deep understanding → taste.
+
+### Choosing What to Go Deep On
+
+**DO NOT pick from a menu. Instead:**
+
+1.  Review your Phase 1B bottleneck log and Phase 1.5 gap analysis.
+2.  Ask: "What broke that I couldn't fully explain?"
+3.  That's what you go deep on.
+
+**Examples of how pain maps to depth:**
+
+  ------------------------------------------------------------------------------
+  Phase 1 Pain                     Go Deep On                  Why
+  -------------------------------- --------------------------- -----------------
+  "Pandas ran out of memory at 1M  Data processing internals   You'll stop
+  rows"                            --- chunked processing,     treating Pandas
+                                   Arrow/Parquet columnar      as a black box
+                                   formats, when to abandon    
+                                   Pandas                      
+
+  "Database queries got slow at    Database internals ---      You'll know why
+  scale"                           indexes, query planning,    things are slow,
+                                   LSM-trees vs. B-trees,      not just that
+                                   connection pooling          they're slow
+
+  "Feature engineering was slow    Feature store architecture  You'll understand
+  and redundant"                   --- online vs. offline      when
+                                   stores, computation         pre-computation
+                                   vs. serving, caching        beats real-time
+                                   strategies                  
+
+  "Couldn't figure out if pipeline Observability deep dive --- You'll design
+  was healthy"                     structured logging,         systems that tell
+                                   distributed tracing, metric you they're sick
+                                   design, alert fatigue       
+
+  "Concurrent pipeline runs fought Distributed systems         You'll understand
+  over resources"                  fundamentals --- locking,   contention at a
+                                   consensus, resource         fundamental level
+                                   isolation, scheduling       
+  ------------------------------------------------------------------------------
+
+### If Phase 1 Was Too Easy (Nothing Really Broke)
+
+This means one of three things:
+
+1.  **You didn't push hard enough in Phase 1B**
+    -   Go back and load test to 100K requests/sec, not 1K
+    -   Process 100M rows, not 1M
+    -   Push until something actually breaks
+2.  **Your system is actually solid** (unlikely but possible)
+    -   Maybe you made good architectural choices
+    -   Maybe you over-engineered appropriately
+    -   If this is true, experts would confirm it
+3.  **You're using overpowered infrastructure** (GCP hides scaling
+    issues)
+    -   GCP free tier is generous --- might not reveal bottlenecks
+    -   Try deploying to a t2.micro AWS instance instead
+    -   Constrain resources to reveal issues
+
+### If You Genuinely Don't Know What Hurt Most
+
+Pick ONE of these structured options:
+
+#### Option A: Database Internals
+
+Read DDIA Chapters 3-4 deeply
+
+Implement a simple storage engine (both LSM-tree and B-tree)
+
+``` python
+# LSM-Tree: Write-optimized (append to log, merge periodically)
+# B-Tree: Read-optimized (in-place updates, balanced tree)
+
+# Implement both. Benchmark for ML feature storage:
+# - Write 1M feature vectors
+# - Read random feature vectors
+# - Range query (all features for user X between dates)
+
+# When is each better?
+```
+
+Connect to your pipeline: Which is better for your feature store? Why?
+Write ADR about storage engine choice for your use case
+
+**Deliverable:** Working implementations, benchmark results, decision
+framework, blog post
+
+#### Option B: Stream Processing Deep Dive
+
+Build a streaming feature pipeline alongside your batch pipeline:
+
+``` python
+# Use Google Pub/Sub or Kafka
+# Real-time feature computation from weather sensor stream
+
+# Handle:
+# - Late arriving data (weather station reports delayed)
+# - Exactly-once semantics (don't double-count)
+# - Backpressure (too many events, consumer can't keep up)
+# - Out-of-order events (timestamps don't match arrival order)
+```
+
+Compare batch vs. stream for your pipeline:
+
+  Dimension     Batch     Stream    Winner For This Use Case
+  ------------- --------- --------- -------------------------------
+  Latency       Hours     Seconds   Stream if real-time needed
+  Complexity    Low       High      Batch (our use case is daily)
+  Cost          \$X       \$Y       Batch
+  Correctness   Easier    Harder    Batch
+  Operability   Simpler   Complex   Batch
+
+Write ADR: When is streaming worth the complexity for ML pipelines?
+
+**Deliverable:** Working streaming pipeline, batch vs. stream
+comparison, decision framework, blog post
+
+#### Option C: Observability Deep Dive
+
+Read *Observability Engineering* by Charity Majors (key chapters: 1-4,
+7-9)
+
+Implement proper observability for your pipeline:
+
+``` python
+# Structured logging with correlation IDs
+# Every log line traceable to a specific pipeline run
+
+import structlog
+import uuid
+
+logger = structlog.get_logger()
+
+@asset
+def weather_features(context, raw_data):
+    run_id = str(uuid.uuid4())
+    logger.info(
+        "feature_engineering_started",
+        run_id=run_id,
+        rows=len(raw_data),
+        timestamp=datetime.utcnow().isoformat()
+    )
+    # ... processing ...
+    logger.info(
+        "feature_engineering_completed",
+        run_id=run_id,
+        output_rows=len(result),
+        duration_ms=duration
+    )
+
+# Custom metrics that actually matter:
+from prometheus_client import Gauge, Histogram
+
+feature_freshness = Gauge(
+    "feature_freshness_hours",
+    "How old are the features being served"
+)
+
+data_quality_score = Gauge(
+    "data_quality_score",
+    "Percentage of valid records in batch",
+    ["batch_id"]
+)
+
+# Alerts that DON'T cause fatigue:
+# - Alert on symptoms, not causes
+# - Alert on rates of change, not absolute values
+# - Every alert has a runbook
+```
+
+Design a dashboard that answers: "Is the system healthy?" in 10 seconds
+Write ADR: What to monitor vs. what to log vs. what to trace
+
+**Deliverable:** Full observability stack, dashboard screenshot, alert
+design document, blog post
+
+------------------------------------------------------------------------
+
+### Depth Validation
+
+**You've gone deep enough when:**
+
+-   [ ] You can explain the concept to your accountability partner and
+    answer their follow-up questions
+-   [ ] You know when the technology is the WRONG choice (not just how
+    to use it)
+-   [ ] You've written an ADR that captures trade-offs a junior engineer
+    wouldn't see
+-   [ ] Your Phase 1 pipeline is better because of what you learned
+-   [ ] You can write a blog post teaching this to others
+
+**You haven't gone deep enough when:**
+
+-   You can recite facts but can't explain trade-offs
+-   You followed a tutorial but couldn't modify the approach
+-   You don't know when NOT to use the technology
+-   You can't explain it without looking at notes
+
+------------------------------------------------------------------------
+
+## Phase 3: Resilience & Production Hardening (5-6 Weeks)
+
+**Goal:** Make your pipeline survive the chaos of production. Develop
+operational taste.
 
 ### Week 1-2: Resilience Patterns
 
-- [ ] Study resilience patterns:
-  - **Circuit Breakers:** Stop calling a failing service
-  - **Retries:** With exponential backoff and jitter
-  - **Bulkheads:** Isolate failures so they don't spread
-  - **Timeouts:** Don't wait forever
-  - **Fallbacks:** Degrade gracefully
-- [ ] Read *Release It!* by Michael Nygard (Chapters 5-7)
+**Study first:**
 
-### Observability Setup (Do This Before Chaos Engineering)
+Read *Release It!* by Michael Nygard, Chapters 4-8
 
-- [ ] Implement structured logging (JSON logs, correlation IDs)
-- [ ] Add metrics (Prometheus + Grafana, or DataDog free tier)
-- [ ] Set up alerts that actually matter (avoid alert fatigue)
-- [ ] Create a "runbook" for common failure scenarios
-- [ ] Practice debugging production issues with ONLY logs (no debugger access)
+Understand these patterns (don't just implement them --- understand WHEN
+each is appropriate):
 
-### Week 3-5: Chaos Engineering Lab
+  -------------------------------------------------------------------------
+  Pattern      What It Does       When to Use        When NOT to Use
+  ------------ ------------------ ------------------ ----------------------
+  Circuit      Stops calling a    External service   Internal function
+  breaker      failing dependency calls              calls
 
-**Project: Make Your System Survive Network Failures**
+  Retry with   Retries failed     Transient failures Permanent failures
+  backoff      operations with    (network blips)    (bad input)
+               increasing delay                      
 
-Enhancement to your URL shortener:
+  Timeout      Abandons slow      Any external call  CPU-bound computation
+               operations                            
 
-1. **Add a second service** (analytics service that tracks clicks)
-2. **Implement resilience patterns:**
-   - Circuit breaker: If analytics is down, still serve URLs
-   - Timeout: Don't wait forever for analytics response
-   - Fallback: Serve cached click count if live count unavailable
-3. **Install [Toxiproxy](https://github.com/Shopify/toxiproxy) to simulate:**
-   - 5-second network latency
-   - 50% packet loss
-   - Complete network partition
-4. **Record your system's behavior during each failure mode**
+  Fallback     Provides degraded  When "something"   When wrong answer is
+               but functional     \> "nothing"       worse than no answer
+               response                              
 
-#### Database Operations Exercise
+  Bulkhead     Isolates failures  Multi-tenant or    Simple single-path
+               to one component   multi-dependency   systems
 
-- [ ] Practice a zero-downtime schema migration on your live database:
-  - Add a column to the `urls` table while the app is running
-  - Document your migration strategy (expand-contract pattern, etc.)
-- [ ] Perform a backup and restore:
-  - Back up your database
-  - Corrupt or delete some data
-  - Restore from backup
-  - Measure: How long did recovery take? How much data was lost?
+  Dead letter  Captures failed    Async message      Synchronous
+  queue        messages for later processing         request/response
+               processing                            
+  -------------------------------------------------------------------------
 
-#### Deliverable
+**ADR opportunity:** For each pattern you add, write an ADR explaining
+why you chose it for that specific location.
 
-- [ ] Updated application with resilience patterns implemented
-- [ ] 3-minute demo video showing:
-  - Normal operation (all services healthy)
-  - Service degradation (slow but working)
-  - Graceful failure (main function works, analytics disabled with clear user messaging)
-- [ ] Chaos test results spreadsheet documenting:
+### Week 2-3: Implement Resilience
 
-| Failure Injected | System Behavior | User Experience Impact | Recovery Time |
-|------------------|-----------------|----------------------|---------------|
-| 5s latency | ... | ... | ... |
-| 50% packet loss | ... | ... | ... |
-| Full partition | ... | ... | ... |
-| Database failover | ... | ... | ... |
+**Add a validation service** (this creates a dependency we can break):
+
+``` python
+# validation_service/app.py
+from fastapi import FastAPI
+from pydantic import BaseModel
+
+app = FastAPI()
+
+class WeatherData(BaseModel):
+    temperature: float
+    humidity: float
+    pressure: float
+
+@app.post("/validate")
+def validate_features(data: WeatherData):
+    """Validate weather data quality.
+    
+    Runs domain-specific checks that are too complex
+    for simple schema validation.
+    """
+    issues = []
+    
+    if data.temperature < -90 or data.temperature > 135:
+        issues.append(f"Temperature {data.temperature} outside physical range")
+    if data.humidity < 0 or data.humidity > 100:
+        issues.append(f"Humidity {data.humidity} outside valid range")
+    if data.pressure < 870 or data.pressure > 1085:
+        issues.append(f"Pressure {data.pressure} outside normal range")
+    
+    return {"valid": len(issues) == 0, "issues": issues}
+```
+
+**Add circuit breaker:**
+
+``` python
+import pybreaker
+
+# Circuit opens after 5 failures, stays open for 60 seconds
+validation_breaker = pybreaker.CircuitBreaker(
+    fail_max=5,
+    reset_timeout=60
+)
+
+@asset
+def validated_weather_data(
+    context: AssetExecutionContext,
+    weather_features: pd.DataFrame
+) -> pd.DataFrame:
+    """Validate data with circuit breaker and fallback.
+    
+    Primary: External validation service (richer checks)
+    Fallback: Local validation (basic range checks only)
+    
+    Trade-off accepted: Fallback misses some edge cases,
+    but serving partially-validated data is better than
+    serving nothing. See ADR-007.
+    """
+    try:
+        result = validation_breaker.call(
+            validate_via_service, weather_features
+        )
+        context.log.info("Validated via service", extra={"rows": len(result)})
+        return result
+    except pybreaker.CircuitBreakerError:
+        context.log.warning(
+            "Validation service circuit OPEN — using fallback",
+            extra={"rows": len(weather_features)}
+        )
+        return local_validation_fallback(weather_features)
+
+
+def local_validation_fallback(df: pd.DataFrame) -> pd.DataFrame:
+    """Simple local validation when service is unavailable.
+    
+    Only checks basic ranges. Misses complex cross-field validation.
+    """
+    return df[
+        (df["temperature"] >= -90) & (df["temperature"] <= 135) &
+        (df["humidity"] >= 0) & (df["humidity"] <= 100) &
+        (df["pressure"] >= 870) & (df["pressure"] <= 1085)
+    ]
+```
+
+**Add retry with backoff:**
+
+``` python
+from tenacity import (
+    retry, 
+    stop_after_attempt, 
+    wait_exponential,
+    retry_if_exception_type,
+    before_sleep_log
+)
+import logging
+
+logger = logging.getLogger(__name__)
+
+@retry(
+    stop=stop_after_attempt(3),
+    wait=wait_exponential(multiplier=1, min=4, max=30),
+    retry=retry_if_exception_type((ConnectionError, TimeoutError)),
+    before_sleep=before_sleep_log(logger, logging.WARNING)
+)
+def fetch_weather_data(api_key: str) -> pd.DataFrame:
+    """Fetch weather data with retry.
+    
+    Only retries on transient network errors.
+    Does NOT retry on 4xx errors (bad request = our bug, not transient).
+    
+    Exponential backoff: 4s, 8s, 16s (capped at 30s)
+    This gives the upstream service time to recover.
+    """
+    response = requests.get(
+        WEATHER_API_URL,
+        params={"appid": api_key},
+        timeout=10  # Don't wait forever
+    )
+    response.raise_for_status()
+    return pd.DataFrame(response.json()["data"])
+```
+
+**Add timeout and fallback to serving:**
+
+``` python
+import asyncio
+
+# Simple cache for fallback predictions
+prediction_cache = {}
+
+
+@app.post("/predict")
+async def predict(request: PredictionRequest):
+    feature_hash = hash(tuple(request.dict().values()))
+    
+    try:
+        # 2-second timeout on prediction
+        prediction = await asyncio.wait_for(
+            run_prediction(request),
+            timeout=2.0
+        )
+        # Cache successful predictions
+        prediction_cache[feature_hash] = prediction
+        return {"prediction": prediction, "source": "live"}
+    
+    except asyncio.TimeoutError:
+        cached = prediction_cache.get(feature_hash)
+        if cached is not None:
+            logger.warning(
+                "Model timeout, serving from cache",
+                extra={"feature_hash": feature_hash}
+            )
+            return {
+                "prediction": cached,
+                "source": "cache",
+                "warning": "live model timed out"
+            }
+        raise HTTPException(503, "Model unavailable and no cached prediction")
+```
+
+### Week 3-4: Chaos Engineering
+
+**Set up Toxiproxy:**
+
+``` bash
+docker run -d --name toxiproxy \
+</text>
+
+<old_text line=1405>
+  -p 20000-20010:20000-20010 \
+  ghcr.io/shopify/toxiproxy
+Inject failures systematically:
+
+
+# Test 1: Slow dependency (5-second latency on validation service)
+  -p 8474:8474 \
+  -p 20000-20010:20000-20010 \
+  ghcr.io/shopify/toxiproxy
+Inject failures systematically:
+
+
+```bash
+# Test 1: Slow dependency (5-second latency on validation service)
+toxiproxy-cli create validation -l 0.0.0.0:20000 -u validation-service:8000
+toxiproxy-cli toxic add validation -t latency -a latency=5000
+
+# Expected: Circuit breaker opens after 5 timeouts, fallback kicks in
+# Actual: ___________
+# Did it match expectations? Yes/No
+# If no, why not? ___
+
+# Test 2: Flaky dependency (50% packet loss)
+toxiproxy-cli toxic add validation -t limit_data -a bytes=500
+
+# Expected: Some requests fail, retries handle it
+# Actual: ___________
+
+# Test 3: Total outage (dependency completely gone)
+toxiproxy-cli toxic add validation -t timeout -a timeout=0
+
+# Expected: Immediate circuit break, 100% fallback
+# Actual: ___________
+
+# Test 4: Slow database
+# Add latency to your database connection
+# Expected: Queries time out gracefully, connection pool doesn't exhaust
+# Actual: ___________
+```
+
+**Document results:**
+
+  -------------------------------------------------------------------------
+  Failure Injected Expected Behavior Actual Behavior Matched?   Fix Needed
+  ---------------- ----------------- --------------- ---------- -----------
+  5s latency       Circuit opens                     ✓/✗        
+                   after 5 fails                                
+
+  50% packet loss  Retries succeed                   ✓/✗        
+
+  Total outage     100% fallback                     ✓/✗        
+
+  Slow database    Graceful timeout                  ✓/✗        
+  -------------------------------------------------------------------------
+
+For each mismatch, write:
+
+``` markdown
+# Chaos Test Failure: [Name]
+
+**Expected:** ___
+**Actual:** ___
+**Why the mismatch:** ___
+**Fix applied:** ___
+**Re-test result:** ___
+```
+
+### Week 5: Cost Awareness (Using Free Tier Strategically)
+
+**Goal:** Understand cost implications WITHOUT wasting money.
+
+#### Exercise 1: Analyze Your Free Tier Usage
+
+``` markdown
+# GCP Free Tier Cost Analysis
+
+**Check your actual usage:**
+GCP Console → Billing → Reports
+
+### Actual Usage This Month
+| Resource | Usage | Cost (if not free tier) | Notes |
+|----------|-------|------------------------|-------|
+| Cloud Run requests | X | $Y | |
+| Cloud Run CPU time | X hours | $Y | |
+| GCS storage | X GB | $Y | |
+| GCS operations | X ops | $Y | |
+| Networking egress | X GB | $Y | |
+| **Total if paid** | | **$___** | |
+
+**Time on free tier:** ___ weeks
+**If this were paid:** $___ per week
+**Projected annual cost at current usage:** $___/year
+```
+
+#### Exercise 2: Cost Projection at Scale
+
+``` markdown
+# What Your Architecture Would Cost at Scale
+
+**Use [GCP Pricing Calculator](https://cloud.google.com/products/calculator)**
+
+**Current actual usage (from metrics):**
+- API requests: ___ per day
+- Data processed: ___ GB per day
+- Storage: ___ GB total
+
+### Projected Costs
+
+| Scale | Requests/Day | Data/Day | Storage | Compute | Networking | Total/Month |
+|-------|-------------|----------|---------|---------|-----------|-------------|
+| Current (free) | X | Y GB | Z GB | $0 | $0 | $0 |
+| 100 users | 1K | 10 GB | 100 GB | $5 | $2 | ~$15 |
+| 1K users | 10K | 100 GB | 1 TB | $50 | $20 | ~$150 |
+| 10K users | 100K | 1 TB | 10 TB | $500 | $200 | ~$1,500 |
+| 100K users | 1M | 10 TB | 100 TB | $5K | $2K | ~$15,000 |
+
+### Analysis
+
+**Biggest cost driver:** [Compute? Storage? Network? Data processing?]
+
+**Cost per user:**
+- At 1K users: $0.15 per user/month
+- At 100K users: $0.15 per user/month
+- **Scaling linearly?** Yes/No
+- (If linear = good. If super-linear = architectural problem)
+
+**When does free tier end?**
+- At ___ users or ___ requests/month
+- Current trajectory: Will hit limit in ___ months
+```
+
+#### Exercise 3: Architecture Cost Comparison
+
+``` markdown
+# Expensive Architecture vs. Cheap Architecture
+
+### Scenario: Serving 1M predictions/month
+
+**Architecture A: "Naive" (what you built initially)**
+- Cloud Run: min instances = 5 (always warm)
+- Feature computation: Real-time on every request
+- Storage: GCS Standard for everything
+- **Estimated monthly cost:** $___
+
+**Architecture B: "Optimized"**
+- Cloud Run: min instances = 1 (accept some cold starts)
+- Feature computation: Pre-computed batch, served from cache
+- Storage: GCS Nearline for old data (>30 days), Standard for recent
+- **Estimated monthly cost:** $___
+
+**Savings:** $___/month (___%)
+
+**Trade-offs accepted in Architecture B:**
+- Cold start latency: 2-5s occasionally (acceptable for our use case)
+- Features not real-time: Updated daily (acceptable for weather predictions)
+- Old data access slower: 50-100ms vs. 10ms (rarely accessed anyway)
+
+**Is it worth it?** Yes/No — Why: ___
+
+**ADR: Architecture Cost Optimization**
+```
+
+#### Exercise 4: Find Cost Anti-Patterns in Your Code
+
+``` python
+# Review your code for expensive patterns
+
+# EXPENSIVE: Load entire dataset into memory
+df = pd.read_parquet("gs://bucket/all_data.parquet")
+# Problem: If dataset is 100GB, needs huge instance
+# Cost: High-memory instance = 10x more expensive
+
+# CHEAP: Process in chunks
+for chunk in pd.read_parquet("gs://bucket/all_data.parquet", chunksize=10_000):
+    process(chunk)
+# Cost: Can use smallest instance type
+
+# EXPENSIVE: Store temp files in premium storage
+temp_df.to_parquet("gs://bucket/temp.parquet")
+# GCS Standard: $0.023/GB/month
+# For 1TB temp files: $23/month
+
+# CHEAP: Use appropriate storage class
+temp_df.to_parquet("gs://bucket-nearline/temp.parquet")
+# GCS Nearline: $0.010/GB/month
+# For 1TB: $10/month
+# Savings: $13/month (57%)
+
+# EXPENSIVE: No caching, recompute everything
+def get_features(user_id):
+    # 500ms computation, every call
+    return compute_features(user_id)
+
+# CHEAP: Cache frequently accessed features
+from functools import lru_cache
+
+@lru_cache(maxsize=1000)
+def get_features_cached(user_id):
+    return compute_features(user_id)
+# First call: 500ms, subsequent: <1ms
+# For 1K daily active users: 95% cache hit rate
+# Savings: 95% reduction in compute time
+
+# EXPENSIVE: Always-on instances
+# Cloud Run min_instances = 5
+# Cost: $200/month just for being ready
+
+# CHEAP: Scale to zero when not needed
+# Cloud Run min_instances = 1
+# Cost: $40/month
+# Trade-off: Some requests take 2s (cold start)
+# Acceptable for: Non-latency-critical workloads
+```
+
+``` markdown
+# Cost Anti-Patterns Found in My Code
+
+| Anti-Pattern | Where | Current Cost Impact | Fix | Savings |
+|-------------|-------|---------------------|-----|---------|
+| | | | | |
+
+**Total potential savings:** $___/month at 10K users
+```
+
+#### Exercise 5: Study Someone Else's Expensive Mistake
+
+Pick one cost disaster to analyze:
+
+-   Search: "AWS bill shock" or "GCP unexpected cost" on Hacker News
+-   Examples: Runaway Lambda functions, misconfigured auto-scaling,
+    forgotten GPU instances
+
+``` markdown
+# Cost Disaster Case Study
+
+**Company/Person:** ___
+**What happened:** ___
+
+**Root cause:** ___
+
+**Cost impact:** $___
+
+**How long before discovery:** ___
+
+**How it was discovered:** ___
+
+**How it could have been prevented:**
+1. ___
+2. ___
+3. ___
+
+**Lessons for my architecture:**
+- Alert I should set: ___
+- Config I should double-check: ___
+- Review I should do monthly: ___
+
+**One thing I'm changing RIGHT NOW:** ___
+```
+
+#### Exercise 6: Set Up Cost Safeguards
+
+``` markdown
+# Cost Protection Checklist
+
+- [ ] **Set budget alert**
+  - GCP Console → Billing → Budgets & alerts
+  - Set threshold: $50/month (or your comfort level)
+  - Email alert when: 50%, 90%, 100% of budget
+
+- [ ] **Enable detailed billing export**
+  - Billing → Billing export
+  - Export to BigQuery (free within limits)
+  - Can analyze: "What's costing money?"
+
+- [ ] **Set resource quotas**
+  - IAM → Quotas
+  - Limit: Max instances, max storage, etc.
+  - Prevents: Accidentally spinning up 100 instances
+
+- [ ] **Create cleanup script**
+  ```bash
+  #!/bin/bash
+  # cleanup.sh - run weekly
+  # Delete temp data older than 7 days
+  gsutil -m rm -r "gs://bucket/temp/**"
+  
+  # Stop unused Cloud Run services
+  gcloud run services list --format="value(name)" | \
+    xargs -I {} gcloud run services delete {} --region=us-central1 --quiet
+ Weekly cost review
+
+Calendar reminder: Every Friday
+Check: GCP billing dashboard
+Ask: Any surprises? Trending up? Why?
+Document: Weekly spend, changes from last week
+ Cost review in PR template
+
+
+## Cost Impact (required for infra changes)
+- [ ] Estimated cost change: +$___/month or -$___/month
+- [ ] Reasoning: ___
+- [ ] Approved by: ___
+
+
+**Deliverable Week 5:**
+- [ ] Free tier usage analysis
+- [ ] Cost projections at 3 scales (100, 1K, 10K users)
+- [ ] Architecture cost comparison
+- [ ] Code anti-patterns found and fixed
+- [ ] Cost disaster case study
+- [ ] Cost safeguards implemented
+- [ ] Blog post: "How I optimized my ML pipeline costs (on free tier)"
+
+---
 
 ### Week 6: Blind Incident Drill
 
-**Project: Respond to an Unexpected Failure**
+**The 2 AM Test.**
 
-1. Have someone else (study buddy, mentor) inject a failure into your running system *without telling you what they did*
-2. Your job:
-   - Detect it from monitoring/logs only
-   - Diagnose the root cause
-   - Mitigate the immediate impact
-   - Write a post-mortem
-3. Time yourself from detection to mitigation
-4. Suggested failures your partner can inject:
-   - Kill the analytics service
-   - Add a slow query (e.g., missing index on a new query path)
-   - Fill the disk with logs
-   - Introduce a memory leak
-   - Change a DNS record
+- [ ] Have your accountability partner, cohort member, or mentor inject a failure:
+  - They choose what breaks
+  - You don't know what it is
+  - You can only use logs, metrics, and dashboards to find it
 
-#### Deliverable
+- [ ] Possible failures they can inject:
+  - Kill the validation service
+  - Introduce a slow database query (add `time.sleep(2)` somewhere)
+  - Inject bad data (NaN values, wrong types)
+  - Rate limit the upstream weather API
+  - Fill up disk space with logs
+  - Cause a memory leak (gradually increasing payload sizes)
+  - Break a configuration (wrong env variable)
 
-- [ ] Post-mortem document following this template:
-  - **Detection:** How did you notice? (alert, user report, dashboard)
-  - **Timeline:** Minute-by-minute from detection to resolution
-  - **Root Cause:** What actually broke?
-  - **Mitigation:** What did you do to stop the bleeding?
-  - **Prevention:** What would prevent this from happening again?
-  - **Lessons Learned:** What surprised you?
+- [ ] Time yourself:
+  - Detection time: ___
+  - Diagnosis time: ___
+  - Mitigation time: ___
+  - Total: ___
 
-**The Lesson:** Good systems don't just fail — they fail gracefully with clear degradation paths. And debugging under pressure with only observability tools is a distinct skill from planned chaos engineering.
+- [ ] Write post-mortem:
 
----
+```markdown
+## Incident Report
 
-## Phase 4: Product & Business Context (The PM/CFO Role)
+**Date:** ___
+**Duration:** Detection at T+___, Mitigated at T+___
 
-**Duration:** 6-8 weeks
-**Goal:** Learn that "technical perfection" is often a business failure.
+**What Happened:**
+[Describe what you observed - error rates, latency, etc.]
 
-### Week 1-2: Business Fundamentals
+**Timeline:**
+- T+0: [First signal - alert, dashboard spike, etc.]
+- T+5: [Initial investigation]
+- T+10: [Hypothesis formed]
+- T+15: [Debugging steps taken]
+- T+20: [Root cause identified]
+- T+25: [Mitigation applied]
+- T+30: [Confirmed resolved]
 
-- [ ] Read *The Mom Test* by Rob Fitzpatrick (learn to validate if features are actually needed)
-- [ ] Learn to calculate:
-  - **LTV** (Lifetime Value): How much a customer is worth over their lifetime
-  - **CAC** (Customer Acquisition Cost): How much it costs to acquire a customer
-  - **Payback Period:** How long until you recover CAC
-  - **Burn Rate:** How fast you're spending money
-- [ ] Understand the unit economics of a software business
+**Root Cause:**
+[What actually broke - be specific]
 
-### Week 3-4: Post-Mortem Analysis
+**How I Found It:**
+[Which logs/metrics/dashboards led me there]
 
-**Project: Analyze Failed Startups**
+**What Slowed Me Down:**
+- Missing observability: ___
+- Wrong hypothesis: ___
+- Debugging dead ends: ___
 
-Pick 3 real startup post-mortems (find them on [autopsy.io](https://autopsy.io), [failory.com](https://failory.com), or CB Insights):
+**Mitigation:**
+[What I did to stop the bleeding]
 
-- **One technical failure** (e.g., Knight Capital — $440M loss in 45 minutes)
-- **One product-market fit failure** (e.g., Quibi — $1.75B spent, shut down in 6 months)
-- **One timing failure** (e.g., Webvan — too early for grocery delivery)
+**Prevention:**
+[What I'm adding to prevent/detect this faster next time]
 
-For each, write a 2-page case study:
-
-1. What they built (technical description)
-2. Why it failed (root cause analysis)
-3. What they SHOULD have built instead
-4. What you would have done differently
-5. What the "minimum viable" version would have looked like
-
-#### Deliverable
-
-- [ ] 3 × 2-page case study analyses
-- [ ] Pattern recognition: What do these failures have in common?
-
-### Week 5-6: Constraint Analysis Practice
-
-**Exercise:** Before starting ANY new feature, practice this framework:
-
-#### Constraint Triangle Analysis
-
-```
-1. TIME: How long do we have?
-   - 2 days vs. 2 months changes EVERYTHING
-
-2. QUALITY: What's "good enough"?
-   - 99% uptime vs. 99.99% uptime (very different costs)
-
-3. COST: What resources are available?
-   - 1 engineer vs. 10 engineers vs. $100K AWS budget
+**Taste Lesson:**
+[What does this teach me about system design?]
+[What architectural decision would have prevented this?]
 ```
 
-For each project, explicitly write:
+#### Deliverable Phase 3:
 
-- What we're optimizing for (and what we're sacrificing)
-- What "done" looks like
-- What "good enough" means
+-   [ ] Pipeline with resilience patterns (circuit breaker, retry,
+    timeout, fallback)
+-   [ ] Chaos test results documented
+-   [ ] Cost analysis and optimization (using free tier data)
+-   [ ] Cost safeguards implemented
+-   [ ] Blind incident post-mortem
+-   [ ] ADRs for each resilience decision
+-   [ ] Updated Grafana dashboards
+-   [ ] Blog post: "Making my ML pipeline resilient"
 
-#### Deliverable
+------------------------------------------------------------------------
 
-- [ ] Apply this framework to 5 different project scenarios
-- [ ] Write "investment memos" justifying your constraint choices
+## Phase 4: Business Context & Product Thinking (2-3 Weeks)
 
-### Week 7-8: Real User Research (The Most Important Exercise)
+**Goal:** Technical taste without business taste is incomplete. Learn to
+make build/don't-build decisions.
 
-**Project: Build Something and Watch Real People Use It**
+### Week 1: Business Fundamentals
 
-#### Field Exercise
+**Read *The Mom Test* by Rob Fitzpatrick** (short book, 2-3 days) -
+**Key lesson:** People will lie to be nice. Ask about their behavior,
+not their opinions. - **Examples of bad questions:** "Would you use
+this?" "Is this a good idea?" "Would you pay \$X?" - **Examples of good
+questions:** "How do you currently solve this?" "What did this problem
+cost you last month?" Learn to calculate unit economics:
 
-1. **Build a small tool** (anything simple):
-   - Expense tracker
-   - Habit tracker
-   - Recipe manager
-   - Chrome extension
-   - Doesn't matter WHAT, just make it real
+``` markdown
+# Unit Economics Basics
 
-2. **Get 3-5 REAL people (not friends/family) to use it:**
-   - Post in relevant subreddit/Discord/forum
-   - Use this recruiting script:
+**Cost per prediction:**
+- Compute: $___
+- Storage: $___
+- API calls: $___
+- Total cost per prediction: $___
 
-   > *"I built [X] to solve [Y problem]. I'm looking for 3-5 people to try it for 20 minutes and give honest feedback. No payment, but you get early access and I'll buy you a coffee. DM me if interested."*
+**Revenue per prediction:**
+- Pricing: $___ per prediction
+- Or: $___ per month subscription / ___ predictions = $___ per prediction
 
-   - 3 users is fine. The insight density from even 3 sessions is enormous.
+**Margin:**
+- Margin per prediction: Revenue - Cost = $___
+- Margin %: (Margin / Revenue) x 100 = ___%
 
-3. **Watch them use it** (screenshare, Zoom, in-person):
-   - **DON'T** help them
-   - **DON'T** explain anything
-   - Just watch and take notes
-   - Sessions should be 20-30 minutes max
+**LTV (Lifetime Value):**
+- Average customer lifespan: ___ months
+- Revenue per month: $___
+- Total LTV: ___ months x $___ = $___
 
-4. **Document using this observation template:**
+**CAC (Customer Acquisition Cost):**
+- Marketing spend per month: $___
+- New customers per month: ___
+- CAC: $___ / ___ = $___ per customer
 
-   | Timestamp | What user did | What user said | What user seemed to feel | Your assumption it challenged |
-   |-----------|--------------|----------------|--------------------------|-------------------------------|
-   | 0:00 | ... | ... | ... | ... |
+**Payback period:**
+- CAC / Monthly revenue per customer = ___ months
+- (Want this < 12 months for healthy business)
+```
 
-5. **Write a "Would I Pivot?" memo:**
-   - **Kill it** — why it's not worth pursuing
-   - **Pivot** — what should change based on learnings
-   - **Double down** — what validated your hypothesis
+### Week 2: The Pivot Decision
 
-#### Deliverable
+Your weather pipeline exists. Now ask: should it?
 
-- [ ] User research notes (raw observations using template above)
-- [ ] Decision memo: Kill / Pivot / Double Down (with reasoning)
-- [ ] Reflection: How wrong were your initial assumptions?
+**Step 1: Identify potential users (pick 3 domains)**
 
-**The Lesson:** Engineering without user context is just expensive hobby programming. Most features don't need to exist.
+  -------------------------------------------------------------------------------
+  Domain        User       Problem They    How Weather Prediction Existing
+                Persona    Have            Helps                  Solutions
+  ------------- ---------- --------------- ---------------------- ---------------
+  Agriculture   Farm       Crop planning,  Reduce crop loss by X% Weather.com,
+                manager    frost risk                             NOAA, local
+                                                                  knowledge
 
----
+  Events        Event      Outdoor event   Avoid rain             Weather.com,
+                planner    decisions       cancellations          gut feeling
 
-## Phase 5: AI Oversight & Verification (The Lead Auditor Role)
+  Logistics     Delivery   Route           Avoid weather delays   In-house,
+                company    optimization                           weather APIs
 
-**Duration:** 4-6 weeks
-**Goal:** Effectively supervise the "junior AI" that writes your code.
+  Energy        Solar farm Solar           Better capacity        Expensive
+                operator   forecasting     planning               enterprise
+                                                                  solutions
+  -------------------------------------------------------------------------------
 
-### Week 1-2: Code Review Mastery
+**Step 2: Interview 3 potential users**
 
-- [ ] Review 20+ Pull Requests on real open source projects (choose projects you use)
-- [ ] Focus on: logic errors, not style/formatting
-- [ ] For each PR, ask:
-  - What edge case did they miss?
-  - What happens if this input is null/negative/huge?
-  - What are the security implications?
-  - What breaks if this runs concurrently?
+**Find them:** - Reddit communities (r/farming, r/events, etc.) -
+LinkedIn (search for job titles) - Local businesses (cold email) - Your
+network Use this recruiting script:
 
-### Week 3-4: Property-Based Testing
+``` text
+Subject: Quick question about [their domain] (not selling anything)
 
-**Project: Find Where LLMs Hallucinate**
+Hi [Name],
 
-#### LLM Bug Hunt Exercise
+I'm building a tool for weather-based planning in [their domain].
+Before I build the wrong thing, I'd love to understand how you currently
+handle weather uncertainty.
 
-1. **Ask an LLM (Claude, GPT-4, etc.) to write these functions:**
-   - Date range validator (overlapping ranges, leap years, timezones)
-   - Currency converter with rounding rules
-   - Password strength checker (unicode, length, entropy)
+Could I ask you 5 questions? 15 minutes max, no sales pitch.
 
-2. **For each function, write property-based tests:**
-   - What invariants should ALWAYS hold?
-   - Use [Hypothesis](https://hypothesis.readthedocs.io/) (Python) or [fast-check](https://fast-check.dev/) (JavaScript)
-   - Generate 1,000+ random inputs
-   - Find the cases where AI code breaks
+Happy to buy you a coffee or make a $20 donation to a charity of your choice.
 
-3. **Document for each failure:**
-   - What the AI got wrong
-   - Why it got it wrong (wrong assumption? hallucinated API?)
-   - How to prompt better next time
-   - What the corrected version looks like
+Thanks,
+[Your name]
+```
 
-#### Deliverable
+Mom Test questions (ask these, not "would you use my product"):
 
-- [ ] Test suite with failures documented
-- [ ] "LLM Bug Patterns" document cataloging:
-  - Common failure modes (off-by-one, edge cases, unicode handling)
-  - Types of logic AI consistently gets wrong
-  - Prompting strategies that reduce errors
+**1. "Walk me through the last time weather disrupted your
+\[operations/event/etc.\]"** - Listen for: Specific incident, cost, pain
+level
 
-### Week 5: Architectural Hallucination Detection
+**2. "How do you currently make weather-related decisions?"** - Listen
+for: Tools they use, process, who decides
 
-**Project: Evaluate LLM Architectural Decisions**
+**3. "What did weather uncertainty cost you last year?"** - Listen for:
+Actual dollar amounts or quantifiable impact
 
-This catches the most dangerous LLM failure mode: code that *works* but makes fundamentally wrong structural decisions.
+**4. "If you could wave a magic wand, how would weather forecasting be
+different?"** - Listen for: What they actually want (vs. what you built)
 
-1. **Ask an LLM to design the architecture for a notification system** (email, SMS, push notifications) including:
-   - Data model
-   - API design
-   - Queue/processing strategy
-   - Retry logic
-   - Rate limiting approach
+**5. "Have you tried other weather tools? What happened?"** - Listen
+for: Why they stopped using them, what was missing
 
-2. **Evaluate the output against what you learned in Phases 1-3:**
-   - Would this survive your Phase 1 load tests?
-   - Does it use polling where it should use webhooks?
-   - Is processing synchronous where it should be queued?
-   - Would the data model work at $n = 1{,}000{,}000$ records?
-   - Does it have the resilience patterns from Phase 3?
-   - What happens when the email provider goes down?
+Document findings:
 
-3. **Document the architectural gaps:**
-   - What looks reasonable but would fail at scale
-   - What's missing entirely (monitoring, error handling, graceful degradation)
-   - What the LLM chose that reveals it lacks operational experience
+  --------------------------------------------------------------------------------
+  User   Domain   Current        Real      Pain Level      Willing to      Notes
+                  Solution       Pain?     (1-10)          Switch?         
+  ------ -------- -------------- --------- --------------- --------------- -------
+                                                                           
 
-#### Deliverable
+  --------------------------------------------------------------------------------
 
-- [ ] Architectural review document (red/yellow/green assessment of each decision)
-- [ ] Revised architecture with your corrections and reasoning
+#### Step 3: The Build/Don't Build Decision
 
-### Week 6: Domain Logic Verification
+``` markdown
+# Decision: Should This Product Exist?
 
-**Project: Verify Business Rules in Regulated Domains**
+### Evidence Assessment
 
-#### Compliance Gap Exercise
+**Supports building:**
+- [evidence from interviews]
 
-1. **Pick a regulated domain:**
-   - Finance (overtime pay calculation, tax rules)
-   - Healthcare (HIPAA consent workflows)
-   - Legal (contract validation, data retention)
+**Against building:**
+- [evidence from interviews]
 
-2. **Ask an LLM to generate code for a specific business rule:**
-   - Example: "Calculate overtime pay for California employees"
+### Unit Economics Reality Check
 
-3. **Research the ACTUAL legal rules:**
-   - Read the regulations
-   - Find the edge cases
-   - Understand the penalties for getting it wrong
+**Cost per prediction:** $___
+**What users would pay:** $___
+**At break-even, need:** ___ users
 
-4. **Find where the LLM hallucinated or oversimplified:**
-   - Missing edge cases
-   - Incorrect thresholds
-   - Wrong calculation formulas
-   - Compliance gaps
+### Market Analysis
 
-5. **Document the delta between AI output and legal requirements**
+| Factor | Our Product | Existing Solutions |
+|--------|------------|-------------------|
+| Accuracy | | |
+| Price | | |
+| Ease of use | | |
+| Trust | | |
 
-#### Deliverable
+### Decision
 
-- [ ] Compliance gap analysis (side-by-side comparison)
-- [ ] Corrected implementation with citations to actual regulations
-- [ ] Risk assessment: "If we shipped the AI version, what would break?"
+[ ] BUILD — because: ___
+[ ] PIVOT — to: ___ because: ___
+[ ] KILL — because: ___
 
-**The Lesson:** LLMs are confidently wrong junior developers. You need the domain expertise to catch it — both in logic AND in architecture.
+### If PIVOT: What Domain Instead?
 
----
+**Based on user interviews:**
+[What domain has more pain and fewer solutions?]
 
-## Phase 6: The Capstone (The "Judgment" Test)
+**New direction:**
+[Describe the pivot]
 
-**Duration:** 2-4 weeks
-**Goal:** Synthesize all roles into senior-level decision-making.
+**What changes in the architecture:**
+[What stays, what changes]
 
-### The "Senior Decision" Scenario
+**ADR: Pivot Decision**
+```
 
-**Context:** You're the tech lead for a fintech app launching in 3 weeks.
+#### Step 4: If you pivot, update your pipeline
 
-**The Problem:** Your QA team finds a race condition in the fund transfer logic:
+Modify data ingestion for new domain Update model for specific use case
+Add domain-specific features
 
-- If two transfers happen simultaneously from the same account
-- And both check balance at the exact same moment
-- Both might succeed, overdrafting the account
+This tests: Can you adapt existing infrastructure to new requirements?
 
-**Your Options:**
+**Why pivoting is valuable:** Real engineering careers involve constant
+pivots. The ability to reuse and adapt existing systems (rather than
+rebuild from scratch) is core judgment.
 
-| Option | Description | Trade-off |
-|--------|-------------|-----------|
-| A | Delay launch 4 weeks to fix properly (database transaction isolation) | Safety vs. time |
-| B | Ship with the bug (low probability, add monitoring, accept the risk) | Speed vs. risk |
-| C | Ship with a quick fix (global mutex lock = slower transfers, but safe) | Safety vs. performance |
-| D | Something else? (be creative) | ??? |
+### Week 3: Implement the Pivot (If You Pivoted)
 
-**Business Context:**
+``` markdown
+# Pivot Implementation Plan
 
-- $2M already spent on marketing for the launch date (sunk cost)
-- Competitors launching similar product next month (timing pressure)
-- Board expects 10K users in month 1 (growth expectations)
-- Average transaction: $500 (financial exposure)
-- Bug bounty program: you'll cover any overdrafts caused by bugs (liability)
+**What stays the same:**
+- Dagster orchestration
+- MLflow tracking
+- FastAPI serving
+- Prometheus monitoring
 
-### Required Deliverable
+**What changes:**
+- Data source: [old] → [new]
+- Features: [old] → [new]
+- Model: [old] → [new]
+- Output: [old] → [new]
 
-#### 1. Decision Memo (2 pages maximum)
+**Timeline:**
+- Day 1-2: New data source integration
+- Day 3-4: Domain-specific features
+- Day 5-7: Retrain model
+- Day 8-10: New output format / delivery
+- Day 11-12: Test with actual user
 
-**Executive Summary:**
-- Your recommendation (A/B/C/D)
-- Key reasoning in 3 sentences
+**Success metric:**
+At least 1 real user says "this is useful" or "I'd pay for this"
+```
 
-**Technical Analysis:**
-- What's the ACTUAL risk? ($\text{probability} \times \text{impact}$)
-- What testing did you do to understand the race condition?
-- What's the exploit scenario in detail?
-- What monitoring would detect if it occurs?
+#### Deliverable Phase 4:
 
-**Business Analysis:**
-- Cost of each option (time, money, opportunity cost)
-- Revenue impact of delay vs. risk of bug
-- Competitive positioning implications
-- Reputational risk assessment
+-   [ ] User interview notes (3 interviews, Mom Test format)
+-   [ ] Build/pivot/kill decision with evidence
+-   [ ] Unit economics analysis
+-   [ ] If pivoted: Updated pipeline for new domain
+-   [ ] If pivoted: Tested with at least 1 real user
+-   [ ] ADR for the business decision
+-   [ ] Blog post: "Why I pivoted from X to Y"
 
-**Risk Mitigation Plan:**
-- If you ship, what safeguards go in place?
-- Detection: How will you know if the bug occurs?
-- Response: What's the incident response plan?
-- Communication: How do you inform affected users?
+------------------------------------------------------------------------
 
-**Rollback Plan:**
-- If things go wrong, what's the escape hatch?
-- How quickly can you disable fund transfers?
-- What's the customer communication strategy?
+## Phase 5: AI Oversight & Verification (3-4 Weeks)
 
-#### 2. Present to a "Board"
+**Goal:** Learn to work WITH LLMs effectively --- including knowing when
+they're wrong.
 
-- [ ] Find 3-5 people to be your review panel (mentors, peers, online community — you identified these in Phase 0)
-- [ ] Present your decision memo
-- [ ] Defend your reasoning
-- [ ] Answer hostile questions:
-  - *"Why didn't you consider option X?"*
-  - *"What if the probability is higher than you think?"*
-  - *"Who gets fired if this goes wrong?"*
-- [ ] Show you've thought through 2nd and 3rd order effects
+### Week 1: Understanding LLM Strengths and Failure Modes
 
-#### Deliverable
+**This is NOT "find bugs in LLM code." It's developing judgment for when
+and how to use LLMs.**
 
-- [ ] Written decision memo
-- [ ] Presentation slides (5-10 slides)
-- [ ] Recording of your defense (or detailed notes from feedback session)
-- [ ] Reflection: What would you change after the challenge questions?
+#### Exercise 1: Decomposition Judgment
 
-**The Lesson:** Senior judgment is about navigating trade-offs with incomplete information under time pressure. There's no "right" answer — only well-reasoned positions.
+Take a real task from your pipeline and try three approaches:
 
----
+``` markdown
+# Task: Add data quality monitoring to the feature pipeline
 
-## Continuous Practices (Throughout All Phases)
+### Approach A: Ask LLM to do everything at once
 
-### Communication: Write About What You Learn
+**Prompt:**
+"Write a complete data quality monitoring system for my ML pipeline that checks 
+for drift, missing values, outliers, and schema violations, integrated with 
+Prometheus and Grafana."
 
-After each phase deliverable:
+**Result:**
+[Paste what LLM generated]
 
-- [ ] Write a blog post explaining what you learned:
-  - What surprised you
-  - What you'd do differently
-  - What patterns you noticed
-- [ ] Benefits:
-  - Forces synthesis of knowledge
-  - Practice explaining technical concepts
-  - Builds public portfolio
-  - Gets feedback from readers
+**Quality: ___/10**
 
-### Monthly Reflection
+**What went wrong:**
+- ___
 
-Answer these questions at the end of each month:
+**What went right:**
+- ___
 
-1. What surprised me this month?
-2. What failure taught me the most?
-3. What would I do differently on my last project?
-4. How has my judgment changed?
+### Approach B: Decompose into pieces
 
----
+**Prompt 1:** "What are the most important data quality checks for an ML feature pipeline?"
+**Prompt 2:** "Write a function that detects feature drift using KL divergence."
+**Prompt 3:** "Write Prometheus metrics for tracking data quality over time."
 
-## The Big Trap to Avoid
+**Result:**
+[Paste what LLM generated]
 
-**Don't treat this as a checkbox curriculum.**
+**Quality: ___/10**
 
-❌ **Wrong approach:**
+**What went wrong:**
+- ___
 
-> "I read the SRE book, skimmed some load tests, checked the box"
->
-> "I completed the Juice Shop challenges, moved on"
->
-> "I built the URL shortener, it works, done"
+**What went right:**
+- ___
 
-✅ **Right approach:**
+### Approach C: Use LLM for research, write it yourself
 
-> "I built something, watched it fail at 1,000 QPS, spent a week understanding why connection pooling matters, can now explain the trade-offs to a junior developer"
->
-> "I found a SQL injection in my own code, understood how I missed it during development, changed how I think about user input forever"
->
-> "I talked to 5 users, realized I built the wrong thing, killed a week of work, learned more from that failure than any tutorial"
+**Prompt:** "What are common data quality issues in ML pipelines and how do 
+companies like Netflix and Uber detect them?"
 
-**The deliverables aren't the point — the judgment you develop is the point.**
+**Then:** Write the implementation yourself using the research.
 
----
+**Result:**
+[Your implementation]
 
-## Final Validation
+**Quality: ___/10**
 
-If you complete this curriculum, you should be able to:
+**What went wrong:**
+- ___
 
-- ✅ Look at AI-generated code and immediately spot the subtle race condition
-- ✅ Understand why "technically correct" might be business-wrong
-- ✅ Design systems that fail gracefully instead of catastrophically
-- ✅ Make senior-level trade-off decisions under pressure
-- ✅ Supervise AI-generated code the way a senior engineer supervises juniors
-- ✅ Articulate not just WHAT to build, but WHY (or why not)
-- ✅ Evaluate LLM architectural decisions, not just functional correctness
-- ✅ Respond to production incidents using only observability tools
+**What went right:**
+- ___
 
-**This is the "programmer who survives" profile in an AI-generated-code world.**
+### Judgment: Which approach worked best for this task? Why?
 
----
+**Winner:** Approach ___
+
+**Reasoning:**
+- ___
+- ___
+
+**Pattern I notice:**
+- LLMs are good at: ___
+- LLMs struggle with: ___
+- I should use them for: ___
+- I should NOT use them for: ___
+Exercise 2: Trust Calibration
+For 10 different tasks, predict how much you'd trust LLM output, then test:
+
+
+## LLM Trust Calibration
+
+| Task | Predicted Trust (L/M/H) | Actual Result | Trust Justified? | Why/Why Not |
+|------|------------------------|---------------|------------------|-------------|
+| Boilerplate FastAPI endpoint | High | | | |
+| Data validation logic | Medium | | | |
+| Distributed system design | Low | | | |
+| SQL query optimization | Medium | | | |
+| Error handling strategy | Low | | | |
+| Test generation | Medium | | | |
+| Dockerfile creation | High | | | |
+| Retry/backoff tuning | Low | | | |
+| Documentation writing | High | | | |
+| Architecture decisions | Very Low | | | |
+
+### Pattern I Found
+
+**LLMs are trustworthy for:**
+- Well-documented patterns (FastAPI, Docker)
+- Syntax and boilerplate
+- Research and summarization
+
+**LLMs are dangerous for:**
+- Context-specific decisions (retry tuning, architecture)
+- Edge cases and failure modes
+- Domain-specific logic
+- Anything requiring operational experience
+
+**My decision framework:**
+- Use LLM for: ___
+- Always verify: ___
+- Never trust for: ___
+```
+
+### Week 2: Property-Based Testing for LLM Code
+
+**Exercise: Find What LLMs Miss**
+
+1.  Ask an LLM to write data processing code:
+
+**Prompt:**
+
+``` text
+Write a Python function that processes weather data:
+- Forward-fill missing values
+- Remove outliers beyond 3 standard deviations
+- Normalize all numeric columns to [0, 1] range
+- Return processed DataFrame
+```
+
+2.  Write property-based tests:
+
+``` python
+import hypothesis.strategies as st
+from hypothesis import given, assume, settings
+import pandas as pd
+import numpy as np
+
+# Generate realistic weather data with edge cases
+weather_data = st.fixed_dictionaries({
+    "temperature": st.lists(
+        st.one_of(
+            st.floats(-50, 150),  # Normal range
+            st.just(np.nan),      # Missing values
+            st.floats(1000, 2000) # Outliers
+        ),
+        min_size=10,
+        max_size=100
+    ),
+    "humidity": st.lists(
+        st.one_of(
+            st.floats(0, 100),
+            st.just(np.nan)
+        ),
+        min_size=10,
+        max_size=100
+    )
+})
+
+
+@given(data=weather_data)
+@settings(max_examples=200)
+def test_no_nan_in_output(data):
+    """Output should never contain NaN."""
+    df = pd.DataFrame(data)
+    assume(len(df.dropna()) > 0)  # Need at least some valid data
+    
+    result = llm_process_weather_data(df)
+    assert not result.isnull().any().any(), "Found NaN in output"
+
+
+@given(data=weather_data)
+def test_values_in_range(data):
+    """All normalized values should be in [0, 1]."""
+    df = pd.DataFrame(data)
+    assume(len(df.dropna()) > 0)
+    
+    result = llm_process_weather_data(df)
+    for col in result.select_dtypes(include=[np.number]).columns:
+        assert result[col].min() >= 0, f"{col} has values < 0"
+        assert result[col].max() <= 1, f"{col} has values > 1"
+
+
+@given(data=weather_data)
+def test_row_count_reasonable(data):
+    """Output should have fewer or equal rows (outlier removal)."""
+    df = pd.DataFrame(data)
+    result = llm_process_weather_data(df)
+    assert len(result) <= len(df)
+    assert len(result) > 0, "All rows were removed"
+
+
+# Edge cases LLMs typically miss:
+def test_all_same_values():
+    """When all values identical, normalization shouldn't crash."""
+    df = pd.DataFrame({
+        "temperature": [72.0] * 10,
+        "humidity": [50.0] * 10
+    })
+    result = llm_process_weather_data(df)
+    # Should handle division by zero gracefully
+    assert len(result) > 0
+
+
+def test_single_row():
+    """Single row should be handled."""
+    df = pd.DataFrame({
+        "temperature": [72.0],
+        "humidity": [50.0]
+    })
+    result = llm_process_weather_data(df)
+    assert len(result) == 1
+
+
+def test_all_nan():
+    """All NaN input should not crash."""
+    df = pd.DataFrame({
+        "temperature": [np.nan] * 5,
+        "humidity": [np.nan] * 5
+    })
+    result = llm_process_weather_data(df)
+    # Either returns empty df or raises appropriate error
+    assert isinstance(result, pd.DataFrame)
+
+def test_first_row_nan():
+    """Forward fill doesn't work on first row."""
+    df = pd.DataFrame({
+        "temperature": [np.nan, 72.0, 73.0],
+        "humidity": [50.0, 51.0, 52.0]
+    })
+    result = llm_process_weather_data(df)
+    # Should handle first row NaN appropriately
+    assert not result.isnull().any().any()
+```
+
+3.  Document bugs found:
+
+``` markdown
+# LLM Bug Patterns Found
+
+### Bug 1: Forward-fill on first row
+- **Input:** First row has NaN
+- **What happens:** First row still has NaN (forward-fill fails)
+- **Why LLM missed it:** Didn't think about edge case of first row
+- **Category:** Edge case
+- **Fix:** Handle first row with backfill or drop
+
+### Bug 2: Normalization when min == max
+- **Input:** All values in column are identical
+- **What happens:** Division by zero
+- **Why LLM missed it:** Assumed data has variance
+- **Category:** Edge case
+
+### Bug 3: Outlier removal removes ALL data
+- **Input:** Dataset where all values are outliers
+- **What happens:** Empty DataFrame returned
+- **Why LLM missed it:** Didn't consider pathological data
+- **Category:** Edge case
+
+### Pattern Summary
+
+**LLMs consistently miss:**
+- Edge cases (empty data, single row, all NaN, all same values)
+- First/last element handling (forward-fill, rolling windows)
+- Division by zero scenarios
+- Pathological inputs (all outliers, all invalid)
+
+**LLMs are good at:**
+- Happy path implementation
+- Standard library usage
+- Code structure
+
+**My testing strategy going forward:**
+- ALWAYS add property-based tests for LLM code
+- Focus tests on: edge cases, boundary conditions, empty inputs
+- Don't trust LLM code without testing extreme inputs
+```
+
+### Week 3: Architectural Hallucination Detection (MLOps-Specific)
+
+#### Exercise 1: Evaluate LLM System Design
+
+**Prompt:**
+
+``` text
+Design architecture for real-time ML prediction system:
+- 10K IoT devices sending 1 reading/second each
+- Extract features, run predictions, store results, serve via API
+- Include: data flow, tech stack, scaling strategy, error handling
+```
+
+Evaluate using taste rubric:
+
+``` markdown
+# Architectural Review
+
+| Component | LLM Proposed | Taste Smell | Rating | Issue | Better Approach |
+|-----------|-------------|-------------|--------|-------|-----------------|
+| Data ingestion | | | | | |
+| Processing | | | | | |
+| Feature computation | | | | | |
+| Model serving | | | | | |
+| Storage | | | | | |
+| Error handling | | | | | |
+| Scaling | | | | | |
+| Monitoring | | | | | |
+
+### Overall Assessment
+
+**Critical flaws:**
+1. ___
+2. ___
+3. ___
+
+**What the LLM got right:**
+1. ___
+
+**Corrected architecture:**
+[Draw or describe your version]
+```
+
+#### Exercise 2: Model Monitoring Design (MLOps-Specific)
+
+**Prompt:**
+
+``` text
+Design a model monitoring and automated retraining system for my weather 
+prediction pipeline. Handle concept drift, data drift, and model degradation. 
+Include retraining triggers and rollback strategy.
+```
+
+Evaluate:
+
+``` markdown
+# Model Monitoring Review
+
+### Does the LLM design handle:
+
+| Concern | Addressed? | Quality | What's Missing | My Fix |
+|---------|-----------|---------|---------------|--------|
+| Concept drift detection | | | | |
+| Data drift detection | | | | |
+| Training/serving skew | | | | |
+| When NOT to retrain | | | | |
+| Retraining trigger (statistical basis?) | | | | |
+| Rollback if new model is worse | | | | |
+| A/B testing new model | | | | |
+| Cost of retraining | | | | |
+| Data quality check before retraining | | | | |
+
+### Common LLM Mistakes in This Domain
+
+**Mistake 1: "Retrain every week"**
+- Problem: No thought about WHY or IF retraining is needed
+- Cost: Unnecessary compute
+- Risk: Could make model worse
+
+**Mistake 2: No statistical test for drift**
+- Just says "monitor" without specifics
+- How do you know if drift is real vs. noise?
+
+**Mistake 3: Retrain on all data**
+- Expensive
+- Usually only need recent data
+- Old patterns may not be relevant
+
+**Mistake 4: No shadow mode**
+- Deploy new model directly to production
+- No way to verify it's better
+
+**My corrected design:**
+[Your version with specific thresholds, tests, and rollback]
+```
+
+### Week 4: Code Review Practice
+
+Review 15 PRs on ML infrastructure repos: - Dagster PRs - MLflow PRs -
+Great Expectations PRs
+
+For each PR, write 1-sentence review BEFORE reading other comments:
+
+``` markdown
+# PR Review Log
+
+### PR #1234: "Add retry logic to model registry"
+**My take (before reading reviews):** Missing exponential backoff
+**Actual reviews said:** [compare after reading]
+**Did I catch it?** Yes/No
+**What I missed:** ___
+
+[Repeat for 15 PRs]
+
+### Accuracy Over Time
+| PRs 1-5 | PRs 6-10 | PRs 11-15 |
+|---------|----------|-----------|
+| Caught ___/5 | Caught ___/5 | Caught ___/5 |
+
+**Am I getting better?** Yes/No
+**Evidence:** ___
+```
+
+#### Deliverable Phase 5:
+
+-   [ ] LLM decomposition and trust calibration analysis
+-   [ ] Property-based test suite catching 5+ edge cases in LLM code
+-   [ ] Architectural review of LLM-generated system design
+-   [ ] Model monitoring review (MLOps-specific)
+-   [ ] PR review accuracy log (15 PRs)
+-   [ ] Blog post: "What LLMs get wrong about ML infrastructure"
+
+------------------------------------------------------------------------
+
+## Phase 6: The Capstone --- Real Constraints (2-3 Weeks)
+
+**Goal:** Synthesize everything under realistic pressure. This uses a
+DIFFERENT system --- because in real careers, you inherit other people's
+code.
+
+### Setup: The Inherited System
+
+Create a deliberately flawed ML pipeline (or have your cohort member
+create one):
+
+``` markdown
+# The Inherited System
+
+**Scenario:** You're the new founding engineer at a startup. Day 1, you inherit:
+
+- A partially-working recommendation pipeline (NOT weather — something new)
+- Built by a contractor who's now gone
+- No monitoring
+- Intermittent data corruption
+- Works on laptop, crashes in prod after 30 minutes
+- No tests, no documentation
+- CEO says: "Demo to investors in 2 weeks"
+- $50K in bank, 3 months runway
+
+### If working solo:
+Fork an intentionally-buggy repo (create one or find community-provided)
+Or: Ask LLM to generate a "messy but functional" recommendation pipeline,
+then break it in 3-4 subtle ways yourself
+
+### If working with cohort:
+Each person creates a buggy pipeline, swaps with another
+You fix theirs, they fix yours
+```
+
+### Week 1: Triage Under Constraints
+
+You have 2 weeks, limited money, and a demo to deliver.
+
+``` markdown
+# Triage Decision
+
+### System Assessment (spend 4 hours max)
+
+| Component | Status | Severity (1-10) | Fix Time | Blocks Demo? |
+|-----------|--------|----------------|----------|--------------|
+| Data ingestion | | | | |
+| Feature engineering | | | | |
+| Model training | | | | |
+| Model serving | | | | |
+| Monitoring | | | | |
+| Tests | | | | |
+| Documentation | | | | |
+
+### Demo Requirements (from "CEO")
+
+**Must show:**
+- ___
+- ___
+
+**Nice to have:**
+- ___
+
+**Doesn't matter for demo:**
+- ___
+
+### Triage Matrix
+
+| Issue | Blocks Demo? | Fix Time | Fix Now? | Rationale |
+|-------|-------------|----------|----------|-----------|
+| | | | | |
+
+### What I'm Choosing NOT to Fix (and why)
+
+1. ___ — because ___
+2. ___ — because ___
+
+### Technical Debt I'm Deliberately Accepting
+
+| Debt | Consequence | When Must Fix | Risk Level |
+|------|------------|---------------|------------|
+| | | | |
+
+**ADR: Triage Decisions Under Time Constraint**
+```
+
+### Week 2: Ship Under Pressure
+
+Build the minimum demo-able product:
+
+``` markdown
+# Sprint Plan (10 working days)
+
+### Days 1-3: Fix blockers
+- Fix: ___
+- Fix: ___
+- Test: Manual only (no time for automated)
+
+### Days 4-7: Build demo flow
+- Minimum UI (Streamlit or simple frontend)
+- Happy path only
+- Prepare backup data for when live demo fails
+
+### Days 8-10: Polish and practice
+- Demo script (exact clicks, exact words)
+- Rehearse 5 times
+- Failure recovery plan
+
+### What "Good Enough" Means Here
+
+**For demo:**
+- Works for 10 minutes straight
+- Handles 1 user
+- Looks professional
+
+**For production:**
+- Works for 24 hours
+- Handles 100 users
+- Actually tested
+
+**Gap between them:**
+- Massive technical debt
+- Not scalable
+- Not monitored
+- No error handling
+
+**This gap is the price of speed.**
+```
+
+### Week 3: Post-Funding Reality
+
+Scenario: You got funded! \$2M seed round. But...
+
+``` markdown
+# The Aftermath
+
+### Problem: Demo code is now "production"
+- Users are signing up
+- CEO hired salespeople
+- Can't stop the business to refactor
+
+### Refactor Strategy (Expand-Contract Pattern)
+
+#### Phase 1: Build new alongside old (Week 1-2)
+- Build proper version with tests, monitoring
+- Dual-write to both systems
+- Users still on old system
+
+#### Phase 2: Gradual migration (Week 3-4)
+- 10% of users route to new system
+- Monitor error rates, latency, accuracy
+- Rollback ready: Can switch back in 1 minute
+
+#### Phase 3: Increase to 50% (Week 5)
+- If 10% went well, route half to new
+- Monitor comparative metrics
+
+### Phase 4: Full migration (Week 6)
+- 100% on new system
+- Keep old running for 1 week (safety)
+- Decomm old after 1 week stable
+
+### The Hiring Decision
+
+**You can hire ONE person. Who?**
+
+| Role | What They'd Do | Bottleneck They'd Fix | Why Not? |
+|------|---------------|----------------------|----------|
+| Backend eng | Ship features faster | Speed | |
+| ML engineer | Better models | Accuracy | |
+| SRE | Improve reliability | Stability | |
+| Data engineer | Fix data quality | Data quality | |
+
+**Decision:** Hire ___ because current bottleneck is ___.
+
+**Trade-offs:**
+- What stays slow/broken: ___
+- Why that's acceptable: ___
+
+**ADR: First Hire Decision**
+```
+
+#### Deliverable Phase 6:
+
+-   [ ] Triage document with rationale
+-   [ ] Demo sprint plan (what you actually delivered)
+-   [ ] Refactor strategy (expand-contract)
+-   [ ] Hiring decision analysis
+-   [ ] Reflection: "What did constraints teach me about taste?"
+-   [ ] Final ADR count: \_\_\_ (target: 15-25 total)
+-   [ ] Blog post: "What I learned building under constraints"
+
+------------------------------------------------------------------------
+
+## Monthly Practices (Throughout All Phases)
+
+### Monthly Taste Calibration: Blind Architecture Review
+
+**Do this once per month, starting after Phase 1A.**
+
+**1. Find 3 ML pipeline repos on GitHub**
+
+-   Search: "ML pipeline" or "MLOps" or "feature pipeline"
+
+**2. Before reading code, predict (10 minutes per repo):**
+
+``` markdown
+# Blind Review #___ : [Repo Name]
+**Date:** ___
+**Based on README and architecture diagram ONLY**
+
+### Taste Smells I Predict
+
+- [ ] Hidden coupling: Where? ___
+- [ ] Implicit assumptions: Where? ___
+- [ ] Proportionality violations: Where? ___
+- [ ] Time bombs: Where? ___
+- [ ] Operational blindness: Where? ___
+- [ ] Cargo culting: Where? ___
+- [ ] Cleverness over clarity: Where? ___
+
+### Specific Predictions
+
+**What breaks first at 10x scale:** ___
+**Confidence:** Low / Medium / High
+
+**Ugliest part:** ___
+**Confidence:** Low / Medium / High
+
+**Architecture rating:** ___/10
+**Main reason for score:** ___
+```
+
+**3. Read issues, PRs, and discussions**
+
+**4. Compare predictions to reality:**
+
+``` markdown
+## Reality Check
+
+**What actually broke (from issues):** ___
+**Did I predict it?** Yes / No
+**If no, why did I miss it?** ___
+
+**What contributors complained about:** ___
+**Did I predict it?** Yes / No
+**If no, why?** ___
+
+**My rating was ___/10, should have been ___/10**
+**What signals did I miss?** ___
+
+### Score This Review
+
+| Category | Predicted Correctly? | Points |
+|----------|---------------------|--------|
+| What breaks at scale | Yes/No | 0 or 3 |
+| Ugliest part | Yes/No | 0 or 3 |
+| Hidden coupling | Yes/No | 0 or 1 |
+| Time bombs | Yes/No | 0 or 1 |
+| Operational blindness | Yes/No | 0 or 1 |
+| Proportionality | Yes/No | 0 or 1 |
+| **Total** | | **/ 10** |
+```
+
+**5. Track month-over-month:**
+
+``` markdown
+# Taste Development Tracking
+
+| Month | Repos Reviewed | Avg Score | Biggest Blind Spot | Progress Note |
+|-------|---------------|-----------|-------------------|---------------|
+| 1 | 3 | /10 | | |
+| 2 | 3 | /10 | | |
+| 3 | 3 | /10 | | |
+| 4 | 3 | /10 | | |
+| 5 | 3 | /10 | | |
+| 6 | 3 | /10 | | |
+
+**Target: 70%+ by month 6**
+```
+
+------------------------------------------------------------------------
+
+### The 6-Month Return
+
+**Do this 1 month after completing Phase 3.**
+
+``` markdown
+# Maintainability Self-Review
+
+**Instructions:** Wait 1 month, then return to your Phase 1A code cold.
+
+### The Test
+
+1. Don't review code beforehand
+2. Try to add a feature (e.g., add a second model, add a new data source)
+3. Fix a bug you intentionally introduce
+4. Time yourself
+
+### Results
+
+**Time to understand code flow:** ___ minutes
+
+**Could I add feature successfully?** Yes / No
+
+**If no, what blocked me?** ___
+
+### What "Past Me" Did That "Maintenance Me" Hates
+
+1. ___
+2. ___
+3. ___
+
+### The 2 AM Test
+
+**Scenario:** It's 2 AM. Predictions are returning errors.
+
+**Could I find the problem using only logs/metrics?** Yes / No
+
+**How long would it take?** ___ minutes
+
+**What's missing that would help?**
+- Better logs: ___
+- More metrics: ___
+- Clearer structure: ___
+
+### Comparison: Then vs. Now
+
+| Aspect | Then | Now | Why the change |
+|--------|------|-----|---------------|
+| Architecture | | | |
+| Logging | | | |
+| Error handling | | | |
+| Code structure | | | |
+
+### Taste Growth Evidence
+
+**The biggest change in my thinking from Phase 1A to now:**
+___
+
+**Evidence this is intuition, not knowledge:**
+- Can I explain why without notes? Yes / No
+- Do I "feel" what's wrong before I can articulate it? Yes / No
+- Have I applied this in other projects? Yes / No
+```
+
+------------------------------------------------------------------------
+
+### The Ultimate Taste Test
+
+**Do this after completing all phases.**
+
+#### Test 1: The 5-Minute Architecture Review
+
+-   [ ] Find a new ML pipeline repo on GitHub (never seen before)
+-   [ ] Set timer: 5 minutes
+-   [ ] Write down: What breaks, what's ugly, what you'd change, rating
+
+``` markdown
+# 5-Minute Review: [Repo]
+
+**Time limit:** 5 minutes
+
+### Predictions
+- Breaks first: ___
+- Ugliest: ___
+- Would change: ___
+- Rating: ___/10
+
+### After reading issues/PRs
+- Actual problems: ___
+- Accuracy: ___% (what I caught / what existed)
+
+**Did I score 70%+?** Yes / No
+```
+
+#### Test 2: The Design Review Simulation
+
+Junior engineer proposes:
+
+``` python
+@app.post("/predict")
+def predict(user_id: str):
+    # Fetch all user history
+    history = db.query("SELECT * FROM events WHERE user_id = %s", user_id)
+    
+    # Compute features from full history
+    features = compute_features(history)  # 500ms
+    
+    # Make prediction
+    prediction = model.predict(features)  # 100ms
+    
+    return {"prediction": prediction}
+```
+
+Can you (in \< 2 minutes):
+
+**Spot the flaws?**
+
+-   Unbounded query (history grows forever)
+-   Synchronous 500ms computation
+-   No caching (recomputes same features)
+-   No timeout on DB query
+-   No fallback if DB is slow
+
+**Explain WHY each is flawed (not just "it's bad")?**
+
+**Suggest better approaches with trade-offs?**
+
+-   Pre-compute features → but not real-time
+-   Cache features → but cache invalidation
+-   Limit history window → but miss patterns
+
+**Acknowledge when simple might be fine?**
+
+-   At 10 users? This code is perfectly adequate
+
+#### Test 3: Boris's Three Questions
+
+For any system you encounter, can you answer:
+
+**What do we build?** - Not "what's in the ticket" - But "what problem
+are we solving?"
+
+**Why? For whom?** - Not "because PM said so" - But "because these users
+have this pain"
+
+**How does it all fit together?** - Not "my service works" - But
+"system + network + users = working system"
+
+------------------------------------------------------------------------
+
+## Graduation Criteria
+
+### Technical Taste
+
+-   [ ] Can predict failure modes from architecture diagram
+-   [ ] Can explain WHY designs are ugly using taste vocabulary
+-   [ ] Can suggest alternatives with explicit trade-offs
+-   [ ] Can spot when LLM-generated code/architecture will fail
+-   [ ] Knows when simple beats clever (and when it doesn't)
+
+### Operational Taste
+
+-   [ ] Can debug production issues using only observability tools
+-   [ ] Can make triage decisions under time pressure
+-   [ ] Understands cost implications of architecture choices
+-   [ ] Knows when "good enough" beats "perfect"
+
+### Product Taste
+
+-   [ ] Can make build/don't-build decisions with evidence
+-   [ ] Can interview users without leading them (Mom Test)
+-   [ ] Understands unit economics of the systems they build
+
+### Communication Taste
+
+-   [ ] Can explain complex systems to non-technical stakeholders
+-   [ ] Writes ADRs that help future engineers understand decisions
+-   [ ] Provides code reviews that teach, not just criticize
+-   [ ] Can defend technical decisions under hostile questioning
+
+------------------------------------------------------------------------
+
+## Graduation Validation
+
+**Don't self-assess. Get external validation:**
+
+**Minimum bar (required):**
+
+-   [ ] 2 experienced engineers reviewed your work and said "This is
+    solid mid-level work"
+-   [ ] You scored 70%+ on monthly taste calibration (last 3 months
+    average)
+-   [ ] You can whiteboard your Phase 1 architecture and answer hostile
+    questions
+
+**Ideal bar (aspirational):**
+
+-   [ ] 3 staff+ engineers said "I'd hire someone who built this"
+-   [ ] You've contributed meaningfully to open source (merged PR with
+    good design discussion)
+-   [ ] You've written 3+ blog posts that got engagement (comments, not
+    just views)
+
+**If you can't hit minimum bar:**
+
+-   You completed exercises but didn't develop taste
+-   That's okay --- taste takes time
+-   Either: Continue practicing, or get a job with strong mentorship
+
+------------------------------------------------------------------------
+
+## Your Portfolio After Completion
+
+### What You Actually Have
+
+**1. A Production ML System**
+
+-   Complete pipeline, deployed to cloud (GCP free tier)
+-   Tested at scale with documented bottlenecks
+-   Resilient to failures (with evidence from chaos testing)
+-   Cost-analyzed and optimized
+-   Possibly pivoted to new domain based on user research
+
+**2. Architecture Decision Records (15-25)**
+
+-   Every major decision documented with rationale and trade-offs
+-   Shows your thinking, not just your code
+-   Evidence of judgment development
+
+**3. Taste Development Evidence**
+
+-   Monthly blind review accuracy logs (hopefully showing improvement)
+-   Expert feedback gap analyses
+-   Beautiful systems study
+-   Post-mortems from incidents
+
+**4. Business Judgment Artifacts**
+
+-   User interview notes (Mom Test format)
+-   Build/pivot/kill decisions with evidence
+-   Unit economics analysis
+-   Hiring decision analysis
+
+**5. AI Oversight Skills**
+
+-   LLM trust calibration framework
+-   Property-based test suites
+-   Architectural hallucination detection examples
+
+------------------------------------------------------------------------
+
+### What This Portfolio Actually Gets You
+
+**It will help with:**
+
+-   Junior to Mid transition (shows self-direction)
+-   Startups (demonstrates breadth)
+-   Technical discussions with experienced engineers (you speak the
+    language)
+-   Interview conversations (you can debate trade-offs intelligently)
+
+**It will NOT help with:**
+
+-   FAANG interviews (they want LeetCode + classic system design)
+-   Senior+ roles (they want years of impact, not projects)
+-   "X years required" filters (portfolio does not equal experience)
+-   Roles requiring deep specialization
+
+**Realistic job targets after this curriculum:**
+
+-   Mid-level MLOps engineer at Series A startup
+-   Junior/Mid ML platform engineer at tech company
+-   Founding engineer at very early startup (if paired with domain
+    expertise)
+
+**NOT realistic:**
+
+-   Staff engineer at Google (need 8+ YOE + organizational impact)
+-   Senior at established company (usually need 5+ YOE)
+-   Principal anywhere (need 10+ YOE + cross-org influence)
+
+**The value is the taste you developed, not the resume line.**
+
+**This curriculum gives you:**
+
+-   Demonstrated judgment (ADRs, decisions, trade-off analysis)
+-   Real project portfolio (deployed system with evidence of thoughtful
+    design)
+-   Articulate thinking about systems (blog posts, documented decisions)
+
+**It does NOT substitute for:**
+
+-   Years of production experience
+-   Organizational navigation skills
+-   Cross-team coordination
+-   Managing technical debt at scale
+-   Political skills needed at larger companies
+
+**Be honest about what you have vs. what you need for specific roles.**
+
+------------------------------------------------------------------------
 
 ## Resources
 
 ### Books
 
-| Book | Author | Relevant Phases |
-|------|--------|----------------|
-| *Designing Data-Intensive Applications* | Martin Kleppmann | Phase 1 |
-| *Site Reliability Engineering* (Google SRE Book) | Free online | Phase 1, 3 |
-| *Release It!* | Michael Nygard | Phase 3 |
-| *The Mom Test* | Rob Fitzpatrick | Phase 4 |
-| *The Phoenix Project* | Gene Kim | DevOps culture |
+-   **Designing Data-Intensive Applications** --- Martin Kleppmann
+    (Phases 1-2)
+-   **Release It!** --- Michael Nygard (Phase 3)
+-   **The Mom Test** --- Rob Fitzpatrick (Phase 4)
+-   **Observability Engineering** --- Charity Majors et al. (Phase 2-3)
+-   **Building Machine Learning Pipelines** --- Hapke & Nelson
+    (throughout)
 
-### Courses & Challenges
+### Online
 
-- [MIT 6.824 Distributed Systems](https://pdos.csail.mit.edu/6.824/) (free lectures online)
-- [Cryptopals Crypto Challenges](https://cryptopals.com)
-- [OWASP Top 10](https://owasp.org/www-project-top-ten/)
-
-### Tools
-
-| Tool | Purpose | Phase |
-|------|---------|-------|
-| [k6](https://k6.io/) or [Locust](https://locust.io/) | Load testing | 1 |
-| [Toxiproxy](https://github.com/Shopify/toxiproxy) | Chaos engineering | 3 |
-| [OWASP Juice Shop](https://owasp.org/www-project-juice-shop/) | Security practice | 2 |
-| [Hypothesis](https://hypothesis.readthedocs.io/) (Python) / [fast-check](https://fast-check.dev/) (JS) | Property-based testing | 5 |
-| Prometheus + Grafana | Monitoring & observability | 3 |
+-   [Made With ML](https://madewithml.com) --- MLOps fundamentals
+-   [Full Stack Deep Learning](https://fullstackdeeplearning.com) ---
+    Production ML
+-   [SRE Weekly](https://sreweekly.com) --- Incident reports and
+    operational wisdom
+-   [GCP Pricing
+    Calculator](https://cloud.google.com/products/calculator) --- Cost
+    planning
 
 ### Communities
 
-- [Hacker News](https://news.ycombinator.com)
-- [r/ExperiencedDevs](https://reddit.com/r/ExperiencedDevs) (Reddit)
-- Local meetups and conferences
-- Open source projects in your domain
+-   [MLOps Community Slack](https://mlops.community/)
+-   [r/MLOps](https://reddit.com/r/mlops)
+-   [r/ExperiencedDevs](https://reddit.com/r/ExperiencedDevs)
 
----
+### Tools Documentation
+
+-   [Dagster](https://docs.dagster.io)
+-   [MLflow](https://mlflow.org/docs)
+-   [GCP Vertex AI](https://cloud.google.com/vertex-ai/docs)
+-   [Hypothesis](https://hypothesis.readthedocs.io) (property-based
+    testing)
+-   [Locust](https://docs.locust.io) (load testing)
+
+------------------------------------------------------------------------
 
 ## Start Now
 
-**Pick your starting date:** ___________
+**First actions (do today):**
 
-**First actions (do these today):**
+-   [ ] Create a public GitHub repo for this curriculum
+-   [ ] Sign the Three Agreements (write it down, share with someone)
+-   [ ] Set up GCP account (\$300 free credits)
+-   [ ] Install tools:
+    `pip install dagster dagster-webserver mlflow fastapi locust`
+-   [ ] Join MLOps Community Slack
+-   [ ] Write your first blog post: "Why I'm doing this curriculum"
+-   [ ] Tell one person you're doing this (accountability)
+-   [ ] Block Phase 0 time on your calendar (this week)
+-   [ ] Set Phase 1A target completion date: \_\_\_\_\_\_\_\_\_\_\_
 
-1. Star or bookmark this curriculum
-2. Clone/fork it to track your progress
-3. Block time on your calendar for Phase 0
-4. Message one person who could be your study buddy
-5. Tell someone you're doing this (accountability)
+**Your start date:** \_\_\_\_\_\_\_\_\_\_\_
 
-> The difference between reading this and doing this is the difference between knowing *about* judgment and *having* judgment.
+**Your community tier target:** Tier \_\_\_ initially, upgrade to Tier
+\_\_\_ by Phase 3
 
-**Good luck.** You'll need it — not because it's too hard, but because most people quit when things get difficult. That's actually the most important lesson: **staying power is part of the skill.**
+------------------------------------------------------------------------
+
+## Final Thoughts
+
+> "The recipe for great work is: very exacting taste, plus the ability
+> to gratify it."\
+> --- Paul Graham
+
+**AI has solved "the ability to gratify it."**
+
+**This curriculum develops taste.**
+
+**Taste requires:**
+
+-   Hard problems
+-   Failure and reflection
+-   Expert feedback
+-   Community
+-   Time
+-   Honesty about what's working and what isn't
+
+**There is no shortcut.**
+
+Persistence is part of taste. Most people quit when it gets hard. The
+ones who don't are the ones who develop real judgment.
+
+But persistence alone isn't enough. You also need honesty --- the
+ability to recognize when something isn't working and pivot.
+
+**Be persistent, but be honest.**
+
+------------------------------------------------------------------------
+
+**Good luck.**
+
+------------------------------------------------------------------------
+
+## 🎯 Final Notes
+
+This styled version preserves all original content while improving: -
+Visual hierarchy - Section separation - Readability - Emphasis
+consistency - Markdown structure
