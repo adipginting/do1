@@ -20,48 +20,34 @@
 
 ---
 
-## Infrastructure Choice: Why VPS Over Cloud?
+## Infrastructure Choice: Why VPS?
 
-**Managed cloud hides complexity. VPS forces you to confront:**
+**This curriculum uses VPS (Virtual Private Server) exclusively.**
 
-| What Cloud Hides | What VPS Teaches |
-|------------------|------------------|
-| Auto-scaling | CPU/memory pressure awareness |
-| Managed databases | PostgreSQL tuning & recovery |
-| Load balancers | Nginx configuration & reverse proxy |
-| Logging services | Log rotation & journalctl |
+**VPS forces you to confront real infrastructure:**
+
+| Challenge | What You Learn |
+|-----------|----------------|
+| Limited CPU/RAM | Resource optimization & pressure awareness |
+| Manual database setup | PostgreSQL tuning & recovery |
+| No load balancer | Nginx configuration & reverse proxy |
+| No logging service | Log rotation & journalctl |
 | Process management | Systemd unit files |
 | SSL certificates | Let's Encrypt setup |
-| Network isolation | Linux networking & firewalls |
-| Cost abstraction | Resource constraint trade-offs |
+| Network configuration | Linux networking & firewalls |
+| Fixed costs | Architectural trade-offs under constraints |
 
-**Cloud teaches platform usage. VPS teaches systems thinking.**
+**VPS teaches systems thinking from the ground up.**
 
 **Constraint builds taste.**
 
-### Two Paths Forward
-
-You can complete this curriculum using either approach:
-
-**Path A: VPS Edition (Recommended)**
-- **Cost:** $10/month flat, predictable
-- **What you learn:** Systems thinking, Linux, resource constraints
-- **Best for:** Understanding how things actually work
+**Why VPS for this curriculum:**
+- **Cost:** $5-12/month flat, predictable (no surprise bills)
+- **What you learn:** Systems thinking, Linux, resource constraints, how things actually work
 - **Stack:** Self-hosted everything (Dagster, PostgreSQL, MinIO, MLflow)
+- **Philosophy:** Learn under constraints → understand trade-offs → make better decisions
 
-**Path B: Cloud Edition (Original)**
-- **Cost:** Variable, $0-50/month (free tier initially)
-- **What you learn:** Cloud platforms, managed services
-- **Best for:** Industry-standard tooling experience  
-- **Stack:** GCP/AWS managed services
-
-**This document covers both paths.** VPS-specific instructions are marked with 🔧. Cloud-specific instructions are marked with ☁️.
-
-**Choose based on your goal:**
-- Want to understand systems deeply? → VPS
-- Want to match job postings? → Cloud
-- Have limited time? → Cloud (faster setup)
-- Want to minimize costs? → VPS (flat $10/month)
+**Master VPS first. Everything else is just different tooling for the same problems.**
 
 ---
 
@@ -307,11 +293,19 @@ optional.
 
 ### Your Technology Stack
 
-**Recommended (if no strong preferences):** - **Cloud:** Google Cloud
-Platform (free tier: \$300 credits) - **Orchestrator:** Dagster (better
-DX than Airflow for learning) - **Language:** Python 3.9+ -
-**Containers:** Docker - **Monitoring:** Prometheus + Grafana - **ML
-Tracking:** MLflow - **API:** FastAPI - **Load Testing:** Locust
+**Recommended stack:**
+- **Infrastructure:** VPS (Hetzner/DigitalOcean/Vultr, 2GB RAM minimum)
+- **OS:** Ubuntu 22.04 LTS
+- **Orchestrator:** Dagster (better DX than Airflow for learning)
+- **Language:** Python 3.9+
+- **Containers:** Docker + Docker Compose
+- **Database:** PostgreSQL 15
+- **Object Storage:** MinIO (S3-compatible)
+- **Monitoring:** Prometheus + Grafana
+- **ML Tracking:** MLflow
+- **API:** FastAPI + Gunicorn
+- **Web Server:** Nginx (reverse proxy)
+- **Load Testing:** Locust
 
 **If you have a preferred stack, use it. The stack is not the point.**
 
@@ -379,7 +373,7 @@ opportunities arise. Don't wait for the perfect community to begin.
 
 ### Environment Setup
 
-#### 🔧 VPS Setup (Recommended)
+#### VPS Setup
 
 **Step 1: Provision VPS**
 
@@ -531,25 +525,7 @@ docker-compose up -d
 
 ---
 
-#### ☁️ Cloud Setup (Original)
 
-```bash
-# Core tools (local machine)
-brew install docker
-pip install dagster dagster-webserver dagster-gcp dagster-docker
-pip install scikit-learn pandas numpy mlflow
-pip install locust  # load testing
-pip install fastapi uvicorn
-
-# GCP setup
-gcloud auth login
-gcloud config set project YOUR_PROJECT
-gcloud services enable run.googleapis.com storage.googleapis.com
-```
-
-**VPS users:** Skip GCP setup. Use your docker-compose stack from Phase 0.
-
-**Cloud users:** Continue with GCP as shown above.
 
 ---
 
@@ -747,24 +723,7 @@ Serving (FastAPI + Gunicorn behind Nginx)
 Monitoring (Prometheus + Grafana on VPS)
 ```
 
-**☁️ Cloud Architecture:**
-```text
-Data Source (Weather API: OpenWeather or NOAA)
-    ↓
-Ingestion (Dagster asset)
-    ↓
-Storage (GCS bucket — raw parquet files)
-    ↓
-Feature Engineering (Dagster asset)
-    ↓
-Model Training (scikit-learn, tracked with MLflow)
-    ↓
-Model Registry (MLflow model registry)
-    ↓
-Serving (FastAPI endpoint on Cloud Run)
-    ↓
-Monitoring (Prometheus metrics + Grafana dashboard)
-```
+
 
 **Data Ingestion:**
 
@@ -789,9 +748,7 @@ def raw_weather_data(context: AssetExecutionContext) -> pd.DataFrame:
     """
     df = fetch_weather_data(api_key=os.environ["OPENWEATHER_KEY"])
     
-    # Store to MinIO (VPS) or GCS (Cloud)
-    # VPS: df.to_parquet("s3://your-bucket/raw/weather.parquet")
-    # Cloud: df.to_parquet("gs://your-bucket/raw/weather.parquet")
+    # Store to MinIO (S3-compatible)
     storage_path = os.environ.get("STORAGE_PATH", "s3://mlops/raw/weather.parquet")
     df.to_parquet(storage_path)
     
@@ -1015,7 +972,7 @@ def metrics():
 
 -   [ ] GitHub repo with complete pipeline (well-documented)
 -   [ ] Working end-to-end: data in → predictions out
--   [ ] Deployed to GCP (even if just Cloud Run + GCS)
+-   [ ] Deployed to VPS (Docker Compose stack running)
 -   [ ] Basic Grafana dashboard (prediction count, latency, errors)
 -   [ ] Can handle 10 requests/second
 -   [ ] At least 2 ADRs written (orchestrator choice, model choice)
@@ -1110,8 +1067,10 @@ watch -n 1 'df -h'  # Watch disk space
 # - OOM killer activation (check: dmesg | grep oom)
 
 # What breaks first?
-# VPS: OOM killer, disk fills up, CPU pegged at 100%
-# Cloud: Pandas memory errors, timeouts, auto-scaling triggers
+# - OOM killer (RAM exhaustion)
+# - Disk fills up (storage limits)
+# - CPU pegged at 100% (compute limits)
+# - Connection pool exhaustion
 ```
 
 #### Test 2: API Load
@@ -1138,9 +1097,6 @@ class WeatherUser(HttpUser):
 
 # 🔧 VPS: Run locust FROM your local machine TO the VPS
 locust -f locustfile.py --host https://mlops.yourdomain.com
-
-# ☁️ Cloud: Use Cloud Run URL
-# locust -f locustfile.py --host https://your-app.run.app
 
 # Ramp: 10 → 100 → 500 → 1000 users
 # VPS will likely max out around 100-200 concurrent users with 1 vCPU
@@ -1176,11 +1132,12 @@ locust -f locustfile.py --host https://mlops.yourdomain.com
 # - File descriptor limits (check: ulimit -n)
 # - Systemd service restarts
 
-# ☁️ Cloud-specific failures:
-# - GCS rate limiting
-# - Cloud Run concurrency limits
+# VPS-specific failures you'll encounter:
+# - RAM exhaustion (OOM killer)
+# - CPU saturation
+# - Disk I/O bottlenecks
 # - Database connection pool exhaustion
-# - Auto-scaling lag
+# - File descriptor limits
 
 # Do runs interfere with each other?
 ```
@@ -1290,7 +1247,7 @@ docker system prune -a --volumes
 # Cost: $0
 ```
 
-**☁️ Cloud-Specific Fix: Memory scaling**
+**Alternative Fix: Chunk processing**
 ```python
 # Before (loads all into memory):
 df = pd.read_parquet("gs://bucket/data.parquet")
@@ -1322,7 +1279,7 @@ engine = create_engine(
 # Impact: Can handle 50+ concurrent pipeline runs
 # Cost: Same (connection pool is free, just configuration)
 
-# 🔧 VPS: Also tune PostgreSQL
+# Also tune PostgreSQL on your VPS
 # Edit: /etc/postgresql/15/main/postgresql.conf
 # max_connections = 50 (down from 100 - we have limited RAM)
 # shared_buffers = 512MB (25% of 2GB RAM)
@@ -1330,75 +1287,87 @@ engine = create_engine(
 # Restart: sudo systemctl restart postgresql
 ```
 
-### Week 4-5: Cost Analysis (Using Free Tier Data)
+### Week 4-5: Resource Analysis & Cost Awareness
 
 ``` markdown
-# Cost Analysis
+# VPS Resource Analysis
 
-### Current usage (from GCP Console → Billing → Reports)
+### Current VPS usage
+
+**Check your actual usage:**
+```bash
+# Run on your VPS
+htop                    # CPU/RAM usage
+docker stats            # Per-container usage
+df -h                   # Disk usage
+free -h                 # Memory details
+```
 
 **Actual usage this week:**
-| Resource | Usage | Cost (if not free tier) |
-|----------|-------|------------------------|
-| Cloud Run requests | X | $Y |
-| Cloud Run compute time | X hours | $Y |
-| GCS storage | X GB | $Y |
-| GCS operations | X ops | $Y |
-| Networking (egress) | X GB | $Y |
-| **Total if paid** | | **$___/week** |
+| Resource | Usage | VPS Limit | Utilization | Notes |
+|----------|-------|-----------|-------------|-------|
+| RAM | ___ GB | 2 GB | ___% | Peak usage during pipeline runs |
+| CPU | ___% avg | 100% | ___% peak | Average and peak load |
+| Disk | ___ GB | 50 GB | ___% | Data + Docker images + logs |
+| Network | ___ GB | 2 TB | ___% | Usually included in VPS cost |
+| **Total Cost** | | | | **$12/month flat** |
 
-**Time on free tier:** ___ weeks
-**Projected annual cost at current usage:** $___ per year
+**Monthly cost:** $12 (fixed, predictable)
+**Annual cost:** $144 (no surprises)
 
 ### Projected costs at scale
 
-**Use [GCP Pricing Calculator](https://cloud.google.com/products/calculator)**
+**VPS Scaling Strategy:**
 
-| Scale | Requests/Day | Data Processed | Storage | Estimated Cost/Month |
-|-------|-------------|----------------|---------|---------------------|
-| Current | 100 | 1 GB | 10 GB | $0 (free tier) |
-| 100 users | 1K | 10 GB | 100 GB | ~$15 |
-| 1K users | 10K | 100 GB | 1 TB | ~$150 |
-| 10K users | 100K | 1 TB | 10 TB | ~$1,500 |
-| 100K users | 1M | 10 TB | 100 TB | ~$15,000 |
+| Scale | Requests/Day | VPS Config | Monthly Cost | Notes |
+|-------|-------------|------------|--------------|-------|
+| Current (dev) | 100 | 2GB RAM, 1 vCPU | $12 | Single VPS |
+| 100 users | 1K | 4GB RAM, 2 vCPU | $24 | Upgrade VPS |
+| 1K users | 10K | 8GB RAM, 4 vCPU + Redis | $60 | Larger VPS + caching |
+| 10K users | 100K | Load balancer + 3x 4GB VPS | $200 | Horizontal scaling |
+| 100K users | 1M | Load balancer + 10x 8GB VPS | $800 | Multiple VPS + CDN |
 
-### Where costs come from
+### Where bottlenecks come from
 
-**Biggest cost driver:** [Compute? Storage? Network?]
+**Biggest constraint:** [CPU? RAM? Disk I/O? Network?]
 
-**Cost per user:** 
-- At 1K users: $0.15 per user per month
-- At 100K users: $0.15 per user per month
+**Resource per user:** 
+- At 1K users: 2MB RAM per active user
+- At 100K users: 2MB RAM per active user
 - (Good sign if it stays flat - means you're scaling efficiently)
 
-### Architecture cost comparison
+### Architecture comparison (VPS constraints)
 
 **Current "naive" architecture:**
 - Feature computation: Real-time (on every request)
-- Storage class: GCS Standard for everything
-- Instances: Always warm (min instances = 2)
-- **Estimated cost at 10K users:** $___
+- Storage: All data in PostgreSQL (no archiving)
+- Caching: None (every request hits DB)
+- **Peak RAM usage at 10K users:** ___ MB
+- **CPU usage at 10K users:** ___% average
 
 **Optimized architecture:**
-- Feature computation: Pre-computed batch job
-- Storage class: Nearline for old data, Standard for recent
-- Instances: min instances = 1, accept some cold starts
-- **Estimated cost at 10K users:** $___
-- **Savings:** ___% ($___/month)
+- Feature computation: Pre-computed batch job (Dagster asset)
+- Storage: Archive old predictions to MinIO (keeps PostgreSQL lean)
+- Caching: Redis for hot features (95% cache hit rate)
+- **Peak RAM usage at 10K users:** ___ MB
+- **CPU usage at 10K users:** ___% average
+- **Resource savings:** ___% less RAM, ___% less CPU
 
 **Trade-offs in optimized version:**
-- Cold start latency (acceptable for our use case)
 - Features not real-time (acceptable for daily predictions)
-- Slower access to historical data (rarely needed)
+- Cache warmup time on restart (~30 seconds)
+- Redis adds 50MB RAM overhead (worth it for 95% cache hit)
 
-**ADR: Architecture Cost Optimization**
+**ADR: Architecture Resource Optimization**
 ```
+
+**Key insight:** On VPS, optimization is about using what you have efficiently, not spending more money.
 
 #### Deliverable Phase 1B:
 
 -   [ ] Scaling report with 3+ bottlenecks documented
 -   [ ] Load test results with graphs
--   [ ] Cost analysis with projections (using free tier data)
+-   [ ] Resource usage analysis with scaling projections
 -   [ ] Updated Grafana dashboard
 -   [ ] ADRs for each major fix decision
 -   [ ] Blog post: "How my ML pipeline broke at scale (and how I fixed
@@ -1699,10 +1668,10 @@ This means one of three things:
     -   Maybe you made good architectural choices
     -   Maybe you over-engineered appropriately
     -   If this is true, experts would confirm it
-3.  **You're using overpowered infrastructure** (GCP hides scaling
+3.  **You're using overpowered infrastructure** (Too much RAM/CPU hides scaling
     issues)
-    -   GCP free tier is generous --- might not reveal bottlenecks
-    -   Try deploying to a t2.micro AWS instance instead
+    -   Downgrade your VPS to 1GB RAM to force optimization
+    -   Add artificial resource limits via Docker
     -   Constrain resources to reveal issues
 
 ### If You Genuinely Don't Know What Hurt Most
@@ -2126,7 +2095,7 @@ For each mismatch, write:
 **Re-test result:** ___
 ```
 
-### Week 5: Cost Awareness (Using Free Tier Strategically)
+### Week 5: Resource & Cost Awareness
 
 **Goal:** Understand cost implications WITHOUT wasting money.
 
@@ -2160,27 +2129,32 @@ For each mismatch, write:
 - Cost per request (current): $11/month ÷ ___ requests = $___
 ```
 
-**☁️ Cloud Cost Analysis**
+**VPS Cost Analysis**
 
 ```markdown
-# GCP Free Tier Cost Analysis
+# VPS Resource Usage Analysis
 
 **Check your actual usage:**
-GCP Console → Billing → Reports
+```bash
+# Run on your VPS
+htop                    # CPU/RAM
+docker stats            # Per-container usage
+df -h                   # Disk usage
+vnstat -m               # Network usage (if installed)
+```
 
 ### Actual Usage This Month
-| Resource | Usage | Cost (if not free tier) | Notes |
-|----------|-------|------------------------|-------|
-| Cloud Run requests | X | $Y | |
-| Cloud Run CPU time | X hours | $Y | |
-| GCS storage | X GB | $Y | |
-| GCS operations | X ops | $Y | |
-| Networking egress | X GB | $Y | |
-| **Total if paid** | | **$___** | |
 
-**Time on free tier:** ___ weeks
-**If this were paid:** $___ per week
-**Projected annual cost at current usage:** $___/year
+| Resource | Usage | VPS Limit | Utilization | Notes |
+|----------|-------|-----------|-------------|-------|
+| RAM | X GB | 2 GB | X% | Peak usage |
+| CPU | X% avg | 100% | X% peak | |
+| Disk | X GB | 50 GB | X% | |
+| Network | X GB | 2 TB | X% | Included in VPS |
+| **Total Cost** | | | | **$12/month** |
+
+**Current VPS tier:** $___ per month
+**Projected annual cost:** $___/year (fixed)
 ```
 
 #### Exercise 2: Cost Projection at Scale
@@ -2188,7 +2162,7 @@ GCP Console → Billing → Reports
 ``` markdown
 # What Your Architecture Would Cost at Scale
 
-**Use [GCP Pricing Calculator](https://cloud.google.com/products/calculator)**
+**VPS Scaling Calculator:**
 
 **Current actual usage (from metrics):**
 - API requests: ___ per day
@@ -2215,9 +2189,10 @@ GCP Console → Billing → Reports
 - **Scaling linearly?** Yes/No
 - (If linear = good. If super-linear = architectural problem)
 
-**When does free tier end?**
-- At ___ users or ___ requests/month
-- Current trajectory: Will hit limit in ___ months
+**When do you need to upgrade VPS?**
+- When RAM usage consistently > 85%
+- When CPU usage consistently > 80%
+- Current trajectory: Will need upgrade in ___ months
 ```
 
 #### Exercise 3: Architecture Cost Comparison
@@ -2228,15 +2203,15 @@ GCP Console → Billing → Reports
 ### Scenario: Serving 1M predictions/month
 
 **Architecture A: "Naive" (what you built initially)**
-- Cloud Run: min instances = 5 (always warm)
+- Multiple VPS instances: Always-on
 - Feature computation: Real-time on every request
-- Storage: GCS Standard for everything
+- Storage: All data on local disk
 - **Estimated monthly cost:** $___
 
 **Architecture B: "Optimized"**
-- Cloud Run: min instances = 1 (accept some cold starts)
+- Single VPS with Redis caching
 - Feature computation: Pre-computed batch, served from cache
-- Storage: GCS Nearline for old data (>30 days), Standard for recent
+- Storage: Archive old data to cheaper object storage (MinIO tiering)
 - **Estimated monthly cost:** $___
 
 **Savings:** $___/month (___%)
@@ -2292,14 +2267,14 @@ def get_features_cached(user_id):
 # For 1K daily active users: 95% cache hit rate
 # Savings: 95% reduction in compute time
 
-# EXPENSIVE: Always-on instances
-# Cloud Run min_instances = 5
-# Cost: $200/month just for being ready
+# EXPENSIVE: Multiple always-on VPS instances
+# 5 x VPS (4GB each) + load balancer
+# Cost: $150/month for capacity
 
-# CHEAP: Scale to zero when not needed
-# Cloud Run min_instances = 1
-# Cost: $40/month
-# Trade-off: Some requests take 2s (cold start)
+# CHEAP: Single VPS with efficient caching
+# 1 x VPS (2GB) + Redis
+# Cost: $12/month
+# Trade-off: Limited concurrent requests, must optimize
 # Acceptable for: Non-latency-critical workloads
 ```
 
@@ -2317,9 +2292,8 @@ def get_features_cached(user_id):
 
 Pick one cost disaster to analyze:
 
--   Search: "AWS bill shock" or "GCP unexpected cost" on Hacker News
--   Examples: Runaway Lambda functions, misconfigured auto-scaling,
-    forgotten GPU instances
+-   Search: "unexpected hosting costs" or "bill shock" on Hacker News
+-   Examples: Runaway processes, forgotten resources, inefficient architectures
 
 ``` markdown
 # Cost Disaster Case Study
@@ -2353,38 +2327,51 @@ Pick one cost disaster to analyze:
 ``` markdown
 # Cost Protection Checklist
 
-- [ ] **Set budget alert**
-  - GCP Console → Billing → Budgets & alerts
-  - Set threshold: $50/month (or your comfort level)
-  - Email alert when: 50%, 90%, 100% of budget
+- [ ] **Monitor VPS billing**
+  - VPS provider dashboard → Billing
+  - Your cost is flat: $12/month
+  - Alert if you accidentally spin up extra resources
 
-- [ ] **Enable detailed billing export**
-  - Billing → Billing export
-  - Export to BigQuery (free within limits)
-  - Can analyze: "What's costing money?"
+- [ ] **Monitor resource usage alerts**
+  - Set up Prometheus alerts for high CPU/RAM/disk
+  - Email notifications when thresholds exceeded
+  - Can analyze: "What's consuming resources?"
 
-- [ ] **Set resource quotas**
-  - IAM → Quotas
-  - Limit: Max instances, max storage, etc.
-  - Prevents: Accidentally spinning up 100 instances
+- [ ] **Set Docker resource limits**
+  - Edit docker-compose.yml to add resource constraints
+  - Limit: CPU shares, memory limits per container
+  - Prevents: One container consuming all VPS resources
+  
+  ```yaml
+  services:
+    dagster:
+      mem_limit: 512m
+      cpus: 0.5
+  ```
 
 - [ ] **Create cleanup script**
   ```bash
   #!/bin/bash
   # cleanup.sh - run weekly
-  # Delete temp data older than 7 days
-  gsutil -m rm -r "gs://bucket/temp/**"
+  find /data/temp -mtime +7 -delete
   
-  # Stop unused Cloud Run services
-  gcloud run services list --format="value(name)" | \
-    xargs -I {} gcloud run services delete {} --region=us-central1 --quiet
- Weekly cost review
+  # Clean up old Docker images
+  docker image prune -a --filter "until=168h" -f
+  
+  # Clean up logs
+  journalctl --vacuum-time=7d
+  ```
 
-Calendar reminder: Every Friday
-Check: GCP billing dashboard
-Ask: Any surprises? Trending up? Why?
-Document: Weekly spend, changes from last week
- Cost review in PR template
+- [ ] **Weekly resource review**
+
+  ```
+  Calendar reminder: Every Friday
+  Check: VPS resource usage (htop, df -h, docker stats)
+  Ask: Any resource spikes? Disk filling up? Why?
+  Document: Weekly resource usage, changes from last week
+  ```
+
+- [ ] **Resource impact review in PR template**
 
 
 ## Cost Impact (required for infra changes)
@@ -2394,13 +2381,13 @@ Document: Weekly spend, changes from last week
 
 
 **Deliverable Week 5:**
-- [ ] Free tier usage analysis
-- [ ] Cost projections at 3 scales (100, 1K, 10K users)
+- [ ] VPS resource usage analysis
+- [ ] Scaling projections at 3 levels (100, 1K, 10K users)
 - [ ] Architecture cost comparison
 - [ ] Code anti-patterns found and fixed
 - [ ] Cost disaster case study
 - [ ] Cost safeguards implemented
-- [ ] Blog post: "How I optimized my ML pipeline costs (on free tier)"
+- [ ] Blog post: "How I optimized my ML pipeline for 2GB RAM"
 
 ---
 
@@ -2475,8 +2462,8 @@ Document: Weekly spend, changes from last week
 -   [ ] Pipeline with resilience patterns (circuit breaker, retry,
     timeout, fallback)
 -   [ ] Chaos test results documented
--   [ ] Cost analysis and optimization (using free tier data)
--   [ ] Cost safeguards implemented
+-   [ ] Resource usage analysis and optimization
+-   [ ] Resource monitoring and alerts implemented
 -   [ ] Blind incident post-mortem
 -   [ ] ADRs for each resilience decision
 -   [ ] Updated Grafana dashboards
@@ -2514,12 +2501,12 @@ cost you last month?" Learn to calculate unit economics:
 - Cost per prediction: $0.00011
 - **Fixed infrastructure cost is your friend**
 
-**☁️ Cloud Economics:**
-- Compute: $0.0001 per second (Cloud Run)
-- Storage: $0.023 per GB/month (GCS)
-- API calls: $0.0001 per weather API call
-- Database: $0.015 per hour (Cloud SQL)
-- Total cost per prediction: ~$0.0005-0.001 (variable)
+**VPS Economics:**
+- Compute: Flat $12/month (VPS includes CPU/RAM)
+- Storage: Included in VPS (50GB disk)
+- API calls: $0.0001 per weather API call (external API)
+- Database: Included in VPS (PostgreSQL in Docker)
+- Total cost per prediction: $0 marginal (fixed cost model)
 
 **At scale:**
 - 1M predictions/month = $100 API + $200-400 infrastructure = $300-500/month
@@ -2532,7 +2519,7 @@ cost you last month?" Learn to calculate unit economics:
 
 **Margin:**
 - VPS margin per prediction: Revenue - $0.00011 = $___
-- Cloud margin per prediction: Revenue - $0.0004 = $___
+- VPS margin per prediction: Revenue - $0 (marginal cost) = $___
 - Margin %: (Margin / Revenue) x 100 = ___%
 
 **LTV (Lifetime Value):**
@@ -2551,7 +2538,7 @@ cost you last month?" Learn to calculate unit economics:
 
 **Infrastructure Decision:**
 - If serving < 100K requests/month → VPS wins on cost
-- If serving > 1M requests/month → Cloud auto-scaling needed
+- If serving > 1M requests/month → Consider horizontal scaling (multiple VPS)
 - **Document this trade-off in ADR**
 ```
 
@@ -3648,8 +3635,8 @@ have this pain"
 
 **1. A Production ML System**
 
--   Complete pipeline, deployed to cloud (GCP free tier)
--   Tested at scale with documented bottlenecks
+-   Complete pipeline, deployed to VPS
+-   Tested at scale with documented bottlenecks and resource constraints
 -   Resilient to failures (with evidence from chaos testing)
 -   Cost-analyzed and optimized
 -   Possibly pivoted to new domain based on user research
@@ -3750,12 +3737,11 @@ have this pain"
 -   [Made With ML](https://madewithml.com) — MLOps fundamentals
 -   [Full Stack Deep Learning](https://fullstackdeeplearning.com) — Production ML
 -   [SRE Weekly](https://sreweekly.com) — Incident reports and operational wisdom
--   ☁️ [GCP Pricing Calculator](https://cloud.google.com/products/calculator) — Cost planning
--   🔧 [DigitalOcean Tutorials](https://www.digitalocean.com/community/tutorials) — Linux & DevOps
--   🔧 [LinuxJourney](https://linuxjourney.com) — Interactive Linux learning
--   🔧 [Hetzner Docs](https://docs.hetzner.com) — VPS provider documentation
+-   [DigitalOcean Tutorials](https://www.digitalocean.com/community/tutorials) — Linux & DevOps
+-   [Hetzner Docs](https://docs.hetzner.com/) — VPS setup guides
+-   [LinuxJourney](https://linuxjourney.com) — Interactive Linux learning
 
-### 🔧 VPS-Specific Learning
+### VPS-Specific Learning
 
 **Linux Fundamentals:**
 -   [Linux Survival](https://linuxsurvival.com) — Interactive command line tutorial
@@ -3790,12 +3776,11 @@ have this pain"
 
 -   [Dagster](https://docs.dagster.io)
 -   [MLflow](https://mlflow.org/docs)
--   🔧 [MinIO](https://min.io/docs/minio/linux/index.html) — S3-compatible storage
--   ☁️ [GCP Vertex AI](https://cloud.google.com/vertex-ai/docs)
+-   [MinIO](https://min.io/docs/minio/linux/index.html) — S3-compatible storage
 -   [Hypothesis](https://hypothesis.readthedocs.io) — Property-based testing
 -   [Locust](https://docs.locust.io) — Load testing
--   🔧 [Prometheus](https://prometheus.io/docs/introduction/overview/)
--   🔧 [Grafana](https://grafana.com/docs/)
+-   [Prometheus](https://prometheus.io/docs/introduction/overview/)
+-   [Grafana](https://grafana.com/docs/)
 
 ### VPS Providers Comparison
 
@@ -3818,7 +3803,7 @@ have this pain"
 -   [ ] Create a public GitHub repo for this curriculum
 -   [ ] Sign the Three Agreements (write it down, share with someone)
 -   [ ] Provision a VPS ($6-10/month — Hetzner or DigitalOcean)
--   [ ] Register a domain name ($10/year — Namecheap, Cloudflare)
+-   [ ] Register a domain name ($10/year — Namecheap, Porkbun, Cloudflare)
 -   [ ] SSH into your server and complete Phase 0 setup
 -   [ ] Configure firewall, Nginx, SSL certificate
 -   [ ] Deploy docker-compose stack (PostgreSQL, MinIO, Prometheus, Grafana)
@@ -3829,29 +3814,16 @@ have this pain"
 -   [ ] Block Phase 0 time on your calendar (this week)
 -   [ ] Set Phase 1A target completion date: ___________
 
-**☁️ Cloud Edition First Actions:**
-
--   [ ] Create a public GitHub repo for this curriculum
--   [ ] Sign the Three Agreements (write it down, share with someone)
--   [ ] Set up GCP account ($300 free credits) or AWS free tier
--   [ ] Install tools: `pip install dagster dagster-webserver dagster-gcp mlflow fastapi locust`
--   [ ] Configure `gcloud` CLI and authenticate
--   [ ] Create GCS bucket for storage
--   [ ] Join MLOps Community Slack
--   [ ] Write your first blog post: "Why I'm doing this curriculum"
--   [ ] Tell one person you're doing this (accountability)
--   [ ] Block Phase 0 time on your calendar (this week)
--   [ ] Set Phase 1A target completion date: ___________
-
+**First Actions:**
 **Your start date:** ___________
 
-**Your infrastructure choice:** 🔧 VPS / ☁️ Cloud
+**Your infrastructure:** VPS (This curriculum is VPS-only)
 
 **Your community tier target:** Tier ___ initially, upgrade to Tier ___ by Phase 3
 
 **Expected monthly cost:**
 - VPS: $10-15/month (flat, predictable)
-- Cloud: $0-50/month (variable, scales with usage)
+- Total: $12-17/month (predictable, flat rate)
 
 ------------------------------------------------------------------------
 
@@ -3880,7 +3852,7 @@ Persistence is part of taste. Most people quit when it gets hard. The ones who d
 
 But persistence alone isn't enough. You also need honesty — the ability to recognize when something isn't working and pivot.
 
-**Cloud teaches platform usage. VPS teaches systems thinking.**
+**VPS teaches systems thinking. Everything else builds on that foundation.**
 
 **Constraint builds taste.**
 
@@ -3892,13 +3864,13 @@ But persistence alone isn't enough. You also need honesty — the ability to rec
 
 **For VPS Users:**
 - When your server crashes at 2 AM, you'll learn more than any tutorial can teach
-- SSH'ing into a broken system develops intuition that managed services hide
+- SSH'ing into a broken system develops deep operational intuition
 - Every resource constraint forces better architecture decisions
 - Document EVERYTHING — your future self will thank you
 
-**For Cloud Users:**
-- Use the free tier strategically — don't waste money learning
-- Document cost decisions as carefully as technical decisions
+**Remember:**
+- Fixed costs force better architectural decisions than unlimited budgets
+- Document resource constraints as carefully as technical decisions
 - Understand what auto-scaling is hiding from you
 - Know when to drop down to VPS-level thinking
 
@@ -3912,15 +3884,15 @@ But persistence alone isn't enough. You also need honesty — the ability to rec
 
 **Good luck. Build something real.**
 
-🔧 VPS Warriors: May your servers stay up and your logs be readable.
+May your servers stay up and your logs be readable.
 
-☁️ Cloud Builders: May your bills be predictable and your services be reliable.
+
 
 **Now stop reading and start building.**
 
 ------------------------------------------------------------------------
 
-## 🎯 Final Notes
+## Final Notes
 
 This styled version preserves all original content while improving: -
 Visual hierarchy - Section separation - Readability - Emphasis
