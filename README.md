@@ -1,35 +1,69 @@
-# 🚀 MLOps Engineering Judgment Curriculum v3.0
+# 🚀 MLOps Engineering Judgment Curriculum v3.1
 
-## Developing Real Taste Through ML Infrastructure
+## Developing Real Taste Through ML Infrastructure — Constraint-First Edition
 
-------------------------------------------------------------------------
+**Core Thesis:** When LLMs commoditize code implementation, the valuable skill becomes *taste*—knowing what to build, why it's ugly, and how to make it beautiful.
 
-> **Core Thesis:** When LLMs commoditize code implementation, the
-> valuable skill becomes **taste**---knowing what to build, why it's
-> ugly, and how to make it beautiful.
+**Version:** 3.1 (VPS Edition)  
+**Updated:** 2025
 
-------------------------------------------------------------------------
+**What Changed in v3.1:**
+- **Added VPS-first approach:** Build on bare metal, not managed services
+- **Constraint-driven learning:** CPU/memory limits teach systems thinking
+- **Predictable costs:** $10/month VPS instead of surprise cloud bills
+- **Linux mastery required:** No abstraction layers hiding complexity
+- Restructured community requirement as gradient, not gate
+- Split Phase 1 into Build + Scale with reflection point
+- Defined "ugly" concretely with a taste rubric
+- Added Architecture Decision Records throughout
+- Focus on self-hosted infrastructure
 
-# MLOps Engineering Judgment Curriculum v3.0
+---
 
-## Developing Real Taste Through ML Infrastructure
+## Infrastructure Choice: Why VPS Over Cloud?
 
-**Core Thesis:** When LLMs commoditize code implementation, the valuable
-skill becomes *taste*---knowing what to build, why it's ugly, and how to
-make it beautiful.
+**Managed cloud hides complexity. VPS forces you to confront:**
 
-**What Changed in v3.0:** - Restructured community requirement as
-gradient, not gate (you'll actually start) - Split Phase 1 into Build +
-Scale with reflection point - Project evolves across phases (not one
-thin project for 9 months) - Defined "ugly" concretely with a taste
-rubric - Reconnected Phase 2 to your actual pain points - Rewrote Phase
-5 around real LLM usage patterns - Added curriculum-level failure
-detection - Fixed code examples, timeline honesty, portfolio claims -
-Added Architecture Decision Records throughout - Moved philosophical
-foundation to the front - Revised cost awareness to use free tier
-strategically (no money wasted)
+| What Cloud Hides | What VPS Teaches |
+|------------------|------------------|
+| Auto-scaling | CPU/memory pressure awareness |
+| Managed databases | PostgreSQL tuning & recovery |
+| Load balancers | Nginx configuration & reverse proxy |
+| Logging services | Log rotation & journalctl |
+| Process management | Systemd unit files |
+| SSL certificates | Let's Encrypt setup |
+| Network isolation | Linux networking & firewalls |
+| Cost abstraction | Resource constraint trade-offs |
 
-------------------------------------------------------------------------
+**Cloud teaches platform usage. VPS teaches systems thinking.**
+
+**Constraint builds taste.**
+
+### Two Paths Forward
+
+You can complete this curriculum using either approach:
+
+**Path A: VPS Edition (Recommended)**
+- **Cost:** $10/month flat, predictable
+- **What you learn:** Systems thinking, Linux, resource constraints
+- **Best for:** Understanding how things actually work
+- **Stack:** Self-hosted everything (Dagster, PostgreSQL, MinIO, MLflow)
+
+**Path B: Cloud Edition (Original)**
+- **Cost:** Variable, $0-50/month (free tier initially)
+- **What you learn:** Cloud platforms, managed services
+- **Best for:** Industry-standard tooling experience  
+- **Stack:** GCP/AWS managed services
+
+**This document covers both paths.** VPS-specific instructions are marked with 🔧. Cloud-specific instructions are marked with ☁️.
+
+**Choose based on your goal:**
+- Want to understand systems deeply? → VPS
+- Want to match job postings? → Cloud
+- Have limited time? → Cloud (faster setup)
+- Want to minimize costs? → VPS (flat $10/month)
+
+---
 
 ## Why This Curriculum Exists (Read This First)
 
@@ -345,8 +379,162 @@ opportunities arise. Don't wait for the perfect community to begin.
 
 ### Environment Setup
 
-``` bash
-# Core tools
+#### 🔧 VPS Setup (Recommended)
+
+**Step 1: Provision VPS**
+
+Choose a provider:
+- [Hetzner](https://www.hetzner.com/cloud) — Best value, EU-based
+- [DigitalOcean](https://www.digitalocean.com/) — Good docs, worldwide
+- [Vultr](https://www.vultr.com/) — Similar to DO, more locations
+
+Minimum specs:
+- **RAM:** 2GB (4GB recommended)
+- **CPU:** 1 vCPU (2 recommended)
+- **Disk:** 40GB SSD
+- **Cost:** $6-12/month
+
+**Step 2: Initial Server Setup**
+
+```bash
+# SSH into your server
+ssh root@your-server-ip
+
+# Update system
+apt update && apt upgrade -y
+
+# Install Docker
+curl -fsSL https://get.docker.com -o get-docker.sh
+sh get-docker.sh
+
+# Install Docker Compose
+apt install docker-compose -y
+
+# Create non-root user
+adduser mlops
+usermod -aG sudo mlops
+usermod -aG docker mlops
+
+# Configure firewall
+ufw allow OpenSSH
+ufw allow 80/tcp
+ufw allow 443/tcp
+ufw enable
+
+# Install Nginx
+apt install nginx -y
+systemctl enable nginx
+
+# Install Certbot for SSL
+apt install certbot python3-certbot-nginx -y
+```
+
+**Step 3: Setup DNS & SSL**
+
+```bash
+# Point your domain to server IP (A record)
+# example: mlops.yourdomain.com -> your-server-ip
+
+# Get SSL certificate
+certbot --nginx -d mlops.yourdomain.com
+```
+
+**Step 4: Install Python Stack**
+
+```bash
+# Install Python tools
+apt install python3-pip python3-venv -y
+
+# Create virtual environment
+python3 -m venv /home/mlops/venv
+source /home/mlops/venv/bin/activate
+
+# Install packages
+pip install dagster dagster-webserver dagster-docker
+pip install scikit-learn pandas numpy mlflow
+pip install fastapi uvicorn gunicorn
+pip install locust
+pip install psycopg2-binary boto3
+```
+
+**Step 5: Setup Docker Compose Stack**
+
+Create `/home/mlops/docker-compose.yml`:
+
+```yaml
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:15
+    environment:
+      POSTGRES_USER: mlops
+      POSTGRES_PASSWORD: changeme
+      POSTGRES_DB: mlops
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    restart: unless-stopped
+
+  minio:
+    image: minio/minio
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: minioadmin
+      MINIO_ROOT_PASSWORD: changeme
+    volumes:
+      - minio_data:/data
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    restart: unless-stopped
+
+  prometheus:
+    image: prom/prometheus
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus_data:/prometheus
+    ports:
+      - "9090:9090"
+    restart: unless-stopped
+
+  grafana:
+    image: grafana/grafana
+    volumes:
+      - grafana_data:/var/lib/grafana
+    ports:
+      - "3000:3000"
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+  minio_data:
+  prometheus_data:
+  grafana_data:
+```
+
+```bash
+# Start services
+cd /home/mlops
+docker-compose up -d
+```
+
+**You must be able to:**
+- [ ] SSH into your server
+- [ ] Deploy a Docker container
+- [ ] Restart services with systemd
+- [ ] Read logs via `journalctl`
+- [ ] Configure Nginx reverse proxy
+- [ ] View Prometheus metrics
+- [ ] Access Grafana dashboards
+
+**If this is painful — good. That's learning.**
+
+---
+
+#### ☁️ Cloud Setup (Original)
+
+```bash
+# Core tools (local machine)
 brew install docker
 pip install dagster dagster-webserver dagster-gcp dagster-docker
 pip install scikit-learn pandas numpy mlflow
@@ -357,11 +545,13 @@ pip install fastapi uvicorn
 gcloud auth login
 gcloud config set project YOUR_PROJECT
 gcloud services enable run.googleapis.com storage.googleapis.com
-
-# Monitoring (local for now)
-# Create docker-compose.yml with Prometheus + Grafana
-docker-compose up -d prometheus grafana
 ```
+
+**VPS users:** Skip GCP setup. Use your docker-compose stack from Phase 0.
+
+**Cloud users:** Continue with GCP as shown above.
+
+---
 
 ### Architecture Decision Record (ADR) Practice
 
@@ -538,14 +728,34 @@ vs. offline)
 
 **What you're building:**
 
-``` text
+**🔧 VPS Architecture:**
+```text
+Data Source (Weather API: OpenWeather or NOAA)
+    ↓
+Ingestion (Dagster asset running on VPS)
+    ↓
+Storage (MinIO bucket — raw parquet files)
+    ↓
+Feature Engineering (Dagster asset)
+    ↓
+Model Training (scikit-learn, tracked with self-hosted MLflow)
+    ↓
+Model Registry (MLflow model registry on VPS)
+    ↓
+Serving (FastAPI + Gunicorn behind Nginx)
+    ↓
+Monitoring (Prometheus + Grafana on VPS)
+```
+
+**☁️ Cloud Architecture:**
+```text
 Data Source (Weather API: OpenWeather or NOAA)
     ↓
 Ingestion (Dagster asset)
     ↓
 Storage (GCS bucket — raw parquet files)
     ↓
-Feature Engineering (Dagster asset — temporal features, rolling averages)
+Feature Engineering (Dagster asset)
     ↓
 Model Training (scikit-learn, tracked with MLflow)
     ↓
@@ -558,7 +768,7 @@ Monitoring (Prometheus metrics + Grafana dashboard)
 
 **Data Ingestion:**
 
-``` python
+```python
 from dagster import asset, AssetExecutionContext
 import requests
 import pandas as pd
@@ -574,13 +784,16 @@ def raw_weather_data(context: AssetExecutionContext) -> pd.DataFrame:
     
     We're accepting this limitation for now because:
     - Easier to build and test with small datasets
-    - GCP free tier covers this usage
+    - VPS has limited RAM (forces optimization in Phase 1B)
     - Phase 1B will force us to fix it
     """
     df = fetch_weather_data(api_key=os.environ["OPENWEATHER_KEY"])
     
-    # Store to GCS
-    df.to_parquet("gs://your-bucket/raw/weather.parquet")
+    # Store to MinIO (VPS) or GCS (Cloud)
+    # VPS: df.to_parquet("s3://your-bucket/raw/weather.parquet")
+    # Cloud: df.to_parquet("gs://your-bucket/raw/weather.parquet")
+    storage_path = os.environ.get("STORAGE_PATH", "s3://mlops/raw/weather.parquet")
+    df.to_parquet(storage_path)
     
     context.log.info(f"Ingested {len(df)} rows")
     return df
@@ -878,24 +1091,32 @@ breaks teach more than the building.
   rows                                                    
   ------------------------------------------------------------------------
 
-``` bash
+```bash
 # Generate synthetic data at increasing scales
 python scripts/generate_data.py --rows 10000
 python scripts/generate_data.py --rows 100000
 python scripts/generate_data.py --rows 1000000
 python scripts/generate_data.py --rows 10000000
 
-# For each: Run the full pipeline. Time it. Note memory usage.
+# 🔧 VPS: Monitor system resources in real-time
+htop  # Watch RAM usage
+iotop  # Watch disk I/O
+watch -n 1 'df -h'  # Watch disk space
+
+# For each run, record:
+# - Peak RAM usage (will hit 2GB limit!)
+# - CPU saturation
+# - Disk I/O wait time
+# - OOM killer activation (check: dmesg | grep oom)
+
 # What breaks first?
-# - Pandas memory errors?
-# - GCS upload timeouts?
-# - Dagster worker crashes?
-# - Feature engineering becomes impossibly slow?
+# VPS: OOM killer, disk fills up, CPU pegged at 100%
+# Cloud: Pandas memory errors, timeouts, auto-scaling triggers
 ```
 
 #### Test 2: API Load
 
-``` python
+```python
 # locustfile.py
 from locust import HttpUser, task, between
 
@@ -915,8 +1136,14 @@ class WeatherUser(HttpUser):
             "temp_rolling_std": 5.0
         })
 
+# 🔧 VPS: Run locust FROM your local machine TO the VPS
+locust -f locustfile.py --host https://mlops.yourdomain.com
+
+# ☁️ Cloud: Use Cloud Run URL
+# locust -f locustfile.py --host https://your-app.run.app
+
 # Ramp: 10 → 100 → 500 → 1000 users
-locust -f locustfile.py --host http://your-api-url
+# VPS will likely max out around 100-200 concurrent users with 1 vCPU
 
 # At each level, record:
 # - p50, p95, p99 latency
@@ -938,16 +1165,36 @@ locust -f locustfile.py --host http://your-api-url
 
 #### Test 3: Concurrent Pipeline Runs
 
-``` bash
+```bash
 # Trigger 5 → 10 → 20 Dagster runs simultaneously
 # What happens?
-# - Resource contention?
-# - Database connection pool exhaustion?
-# - GCS rate limiting?
-# - Do runs interfere with each other?
+
+# 🔧 VPS-specific failures:
+# - PostgreSQL connection pool exhaustion (default: 100)
+# - RAM exhaustion → OOM killer
+# - Disk I/O bottleneck (check: iostat -x 1)
+# - File descriptor limits (check: ulimit -n)
+# - Systemd service restarts
+
+# ☁️ Cloud-specific failures:
+# - GCS rate limiting
+# - Cloud Run concurrency limits
+# - Database connection pool exhaustion
+# - Auto-scaling lag
+
+# Do runs interfere with each other?
 ```
 
 ### Week 3-4: Fix Bottlenecks
+
+**🔧 VPS Edition: Common bottlenecks you WILL hit:**
+
+1. **OOM Killer** - Linux kills your process when RAM exhausted
+2. **Disk fills up** - Logs, temp files, or data storage
+3. **CPU saturation** - 100% usage, everything slows down
+4. **PostgreSQL locks** - Concurrent writes blocking each other
+5. **Nginx connection limits** - Default worker_connections = 768
+6. **File descriptor limits** - Too many open files (ulimit -n)
 
 For each bottleneck, document in this format:
 
@@ -978,9 +1225,73 @@ For each bottleneck, document in this format:
 
 **Example bottleneck fixes:**
 
-``` python
+**🔧 VPS-Specific Fix: OOM Killer**
+```bash
+# Problem: Pipeline crashes at 1M rows with "Killed"
+# Check: dmesg | grep -i oom
+# Output: "Out of memory: Killed process 1234 (python)"
+
+# Solution 1: Add swap space (emergency backup)
+sudo fallocate -l 2G /swapfile
+sudo chmod 600 /swapfile
+sudo mkswap /swapfile
+sudo swapon /swapfile
+
+# Solution 2: Process in chunks (proper fix)
+```
+
+```python
 # Bottleneck 1: Memory exhaustion at 1M rows
 
+# Before (loads all into memory):
+df = pd.read_parquet("s3://bucket/data.parquet")  # 2GB+ in RAM!
+processed = process_data(df)
+
+# After (chunked processing):
+def process_in_chunks(file_path, chunk_size=100_000):
+    for chunk in pd.read_parquet(file_path, chunksize=chunk_size):
+        yield process_data(chunk)
+
+# Impact: Can now handle 10M+ rows on 2GB RAM VPS
+# Cost: Same ($10/month flat)
+# Trade-off: Slower processing, but completes successfully
+```
+
+**🔧 VPS-Specific Fix: Disk Space**
+```bash
+# Problem: Pipeline fails with "No space left on device"
+# Check: df -h
+# Output: /dev/sda1  40G  39G  0G  100% /
+
+# Find what's using space
+du -sh /* | sort -hr | head -10
+
+# Common culprits:
+# - /var/log (nginx, systemd logs)
+# - /var/lib/docker (old images)
+# - /home/mlops/data (temp files)
+
+# Fix: Log rotation
+sudo nano /etc/logrotate.d/mlops
+# Add:
+# /var/log/mlops/*.log {
+#     daily
+#     rotate 7
+#     compress
+#     delaycompress
+#     missingok
+#     notifempty
+# }
+
+# Clean Docker
+docker system prune -a --volumes
+
+# Impact: Freed 15GB
+# Cost: $0
+```
+
+**☁️ Cloud-Specific Fix: Memory scaling**
+```python
 # Before (loads all into memory):
 df = pd.read_parquet("gs://bucket/data.parquet")
 processed = process_data(df)
@@ -992,6 +1303,7 @@ def process_in_chunks(file_path, chunk_size=100_000):
 
 # Impact: Can now handle 10M+ rows
 # Cost: Same (actually lower - smaller instance needed)
+```
 
 # Bottleneck 2: Database connection pool exhaustion
 
@@ -1009,6 +1321,13 @@ engine = create_engine(
 
 # Impact: Can handle 50+ concurrent pipeline runs
 # Cost: Same (connection pool is free, just configuration)
+
+# 🔧 VPS: Also tune PostgreSQL
+# Edit: /etc/postgresql/15/main/postgresql.conf
+# max_connections = 50 (down from 100 - we have limited RAM)
+# shared_buffers = 512MB (25% of 2GB RAM)
+# effective_cache_size = 1536MB (75% of 2GB RAM)
+# Restart: sudo systemctl restart postgresql
 ```
 
 ### Week 4-5: Cost Analysis (Using Free Tier Data)
@@ -1811,9 +2130,39 @@ For each mismatch, write:
 
 **Goal:** Understand cost implications WITHOUT wasting money.
 
-#### Exercise 1: Analyze Your Free Tier Usage
+#### Exercise 1: Analyze Your Infrastructure Usage
 
-``` markdown
+**🔧 VPS Cost Analysis**
+
+```markdown
+# VPS Cost Analysis
+
+**Monthly Fixed Costs:**
+- VPS: $10/month (Hetzner CPX11)
+- Domain: $1/month (amortized)
+- SSL: $0 (Let's Encrypt)
+- **Total: $11/month**
+
+**Resource Usage (check with monitoring):**
+- CPU: Average ___%, Peak ___%
+- RAM: Average ___GB, Peak ___GB
+- Disk: ___GB used of 40GB
+- Network: ___GB egress/month
+
+**Scale Decision Point:**
+- Current: 2GB RAM, 1 vCPU
+- Next tier: 4GB RAM, 2 vCPU = $20/month
+- **Upgrade when:** RAM consistently > 80% or CPU > 70%
+
+**At what scale do we need to upgrade?**
+- Current handles: ~___ requests/day
+- Upgrade needed at: ~___ requests/day
+- Cost per request (current): $11/month ÷ ___ requests = $___
+```
+
+**☁️ Cloud Cost Analysis**
+
+```markdown
 # GCP Free Tier Cost Analysis
 
 **Check your actual usage:**
@@ -2153,17 +2502,37 @@ cost you last month?" Learn to calculate unit economics:
 # Unit Economics Basics
 
 **Cost per prediction:**
-- Compute: $___
-- Storage: $___
-- API calls: $___
-- Total cost per prediction: $___
+
+**🔧 VPS Economics:**
+- Compute: $0 (included in $10/month flat fee)
+- Storage: $0 (included, until disk full)
+- API calls: $0.0001 per weather API call
+- Total cost per prediction: ~$0.0001
+
+**At scale:**
+- 1M predictions/month = $100 API costs + $10 VPS = $110/month
+- Cost per prediction: $0.00011
+- **Fixed infrastructure cost is your friend**
+
+**☁️ Cloud Economics:**
+- Compute: $0.0001 per second (Cloud Run)
+- Storage: $0.023 per GB/month (GCS)
+- API calls: $0.0001 per weather API call
+- Database: $0.015 per hour (Cloud SQL)
+- Total cost per prediction: ~$0.0005-0.001 (variable)
+
+**At scale:**
+- 1M predictions/month = $100 API + $200-400 infrastructure = $300-500/month
+- Cost per prediction: $0.0003-0.0005
+- **Variable costs scale with usage**
 
 **Revenue per prediction:**
 - Pricing: $___ per prediction
 - Or: $___ per month subscription / ___ predictions = $___ per prediction
 
 **Margin:**
-- Margin per prediction: Revenue - Cost = $___
+- VPS margin per prediction: Revenue - $0.00011 = $___
+- Cloud margin per prediction: Revenue - $0.0004 = $___
 - Margin %: (Margin / Revenue) x 100 = ___%
 
 **LTV (Lifetime Value):**
@@ -2179,6 +2548,11 @@ cost you last month?" Learn to calculate unit economics:
 **Payback period:**
 - CAC / Monthly revenue per customer = ___ months
 - (Want this < 12 months for healthy business)
+
+**Infrastructure Decision:**
+- If serving < 100K requests/month → VPS wins on cost
+- If serving > 1M requests/month → Cloud auto-scaling needed
+- **Document this trade-off in ADR**
 ```
 
 ### Week 2: The Pivot Decision
@@ -3363,69 +3737,128 @@ have this pain"
 
 ### Books
 
--   **Designing Data-Intensive Applications** --- Martin Kleppmann
-    (Phases 1-2)
--   **Release It!** --- Michael Nygard (Phase 3)
--   **The Mom Test** --- Rob Fitzpatrick (Phase 4)
--   **Observability Engineering** --- Charity Majors et al. (Phase 2-3)
--   **Building Machine Learning Pipelines** --- Hapke & Nelson
-    (throughout)
+-   **Designing Data-Intensive Applications** — Martin Kleppmann (Phases 1-2)
+-   **Release It!** — Michael Nygard (Phase 3)
+-   **The Mom Test** — Rob Fitzpatrick (Phase 4)
+-   **Observability Engineering** — Charity Majors et al. (Phase 2-3)
+-   **Building Machine Learning Pipelines** — Hapke & Nelson (throughout)
+-   🔧 **The Linux Command Line** — William Shotts (VPS users)
+-   🔧 **Systems Performance** — Brendan Gregg (VPS deep dive)
 
-### Online
+### Online Resources
 
--   [Made With ML](https://madewithml.com) --- MLOps fundamentals
--   [Full Stack Deep Learning](https://fullstackdeeplearning.com) ---
-    Production ML
--   [SRE Weekly](https://sreweekly.com) --- Incident reports and
-    operational wisdom
--   [GCP Pricing
-    Calculator](https://cloud.google.com/products/calculator) --- Cost
-    planning
+-   [Made With ML](https://madewithml.com) — MLOps fundamentals
+-   [Full Stack Deep Learning](https://fullstackdeeplearning.com) — Production ML
+-   [SRE Weekly](https://sreweekly.com) — Incident reports and operational wisdom
+-   ☁️ [GCP Pricing Calculator](https://cloud.google.com/products/calculator) — Cost planning
+-   🔧 [DigitalOcean Tutorials](https://www.digitalocean.com/community/tutorials) — Linux & DevOps
+-   🔧 [LinuxJourney](https://linuxjourney.com) — Interactive Linux learning
+-   🔧 [Hetzner Docs](https://docs.hetzner.com) — VPS provider documentation
+
+### 🔧 VPS-Specific Learning
+
+**Linux Fundamentals:**
+-   [Linux Survival](https://linuxsurvival.com) — Interactive command line tutorial
+-   [Explain Shell](https://explainshell.com) — Understand any shell command
+-   [htop explained](https://peteris.rocks/blog/htop/) — System monitoring deep dive
+
+**Docker & Systemd:**
+-   [Docker Curriculum](https://docker-curriculum.com)
+-   [Systemd by Example](https://systemd-by-example.com)
+-   [Understanding systemd](https://www.digitalocean.com/community/tutorials/systemd-essentials-working-with-services-units-and-the-journal)
+
+**Nginx & Reverse Proxy:**
+-   [Nginx Beginner's Guide](https://nginx.org/en/docs/beginners_guide.html)
+-   [SSL/TLS Best Practices](https://wiki.mozilla.org/Security/Server_Side_TLS)
+-   [Let's Encrypt Documentation](https://letsencrypt.org/docs/)
+
+**PostgreSQL Administration:**
+-   [PostgreSQL Tutorial](https://www.postgresqltutorial.com)
+-   [Tuning PostgreSQL](https://wiki.postgresql.org/wiki/Tuning_Your_PostgreSQL_Server)
+-   [PostgreSQL Monitoring](https://www.cybertec-postgresql.com/en/monitoring-postgresql-performance/)
 
 ### Communities
 
 -   [MLOps Community Slack](https://mlops.community/)
 -   [r/MLOps](https://reddit.com/r/mlops)
 -   [r/ExperiencedDevs](https://reddit.com/r/ExperiencedDevs)
+-   🔧 [r/selfhosted](https://reddit.com/r/selfhosted) — Self-hosting community
+-   🔧 [r/linuxadmin](https://reddit.com/r/linuxadmin) — Linux systems administration
+-   🔧 [Hacker News](https://news.ycombinator.com) — Tech discussions
 
 ### Tools Documentation
 
 -   [Dagster](https://docs.dagster.io)
 -   [MLflow](https://mlflow.org/docs)
--   [GCP Vertex AI](https://cloud.google.com/vertex-ai/docs)
--   [Hypothesis](https://hypothesis.readthedocs.io) (property-based
-    testing)
--   [Locust](https://docs.locust.io) (load testing)
+-   🔧 [MinIO](https://min.io/docs/minio/linux/index.html) — S3-compatible storage
+-   ☁️ [GCP Vertex AI](https://cloud.google.com/vertex-ai/docs)
+-   [Hypothesis](https://hypothesis.readthedocs.io) — Property-based testing
+-   [Locust](https://docs.locust.io) — Load testing
+-   🔧 [Prometheus](https://prometheus.io/docs/introduction/overview/)
+-   🔧 [Grafana](https://grafana.com/docs/)
+
+### VPS Providers Comparison
+
+| Provider | Best For | Monthly Cost | Locations | Notes |
+|----------|----------|--------------|-----------|-------|
+| [Hetzner](https://www.hetzner.com/cloud) | Best value | €4-20 | EU (Germany, Finland) | Excellent specs for price |
+| [DigitalOcean](https://www.digitalocean.com) | Documentation | $6-24 | Worldwide | Great tutorials |
+| [Vultr](https://www.vultr.com) | Global reach | $6-24 | 25+ locations | Similar to DO |
+| [Linode](https://www.linode.com) | Reliability | $5-20 | Worldwide | Akamai-backed |
+| [OVH](https://www.ovhcloud.com) | Budget | €3-15 | EU/US | Very cheap, variable quality |
 
 ------------------------------------------------------------------------
 
 ## Start Now
 
-**First actions (do today):**
+### Choose Your Path
+
+**🔧 VPS Edition First Actions:**
 
 -   [ ] Create a public GitHub repo for this curriculum
 -   [ ] Sign the Three Agreements (write it down, share with someone)
--   [ ] Set up GCP account (\$300 free credits)
--   [ ] Install tools:
-    `pip install dagster dagster-webserver mlflow fastapi locust`
+-   [ ] Provision a VPS ($6-10/month — Hetzner or DigitalOcean)
+-   [ ] Register a domain name ($10/year — Namecheap, Cloudflare)
+-   [ ] SSH into your server and complete Phase 0 setup
+-   [ ] Configure firewall, Nginx, SSL certificate
+-   [ ] Deploy docker-compose stack (PostgreSQL, MinIO, Prometheus, Grafana)
+-   [ ] Install tools: `pip install dagster dagster-webserver mlflow fastapi locust`
+-   [ ] Join MLOps Community Slack
+-   [ ] Write your first blog post: "Why I'm doing this curriculum (VPS edition)"
+-   [ ] Tell one person you're doing this (accountability)
+-   [ ] Block Phase 0 time on your calendar (this week)
+-   [ ] Set Phase 1A target completion date: ___________
+
+**☁️ Cloud Edition First Actions:**
+
+-   [ ] Create a public GitHub repo for this curriculum
+-   [ ] Sign the Three Agreements (write it down, share with someone)
+-   [ ] Set up GCP account ($300 free credits) or AWS free tier
+-   [ ] Install tools: `pip install dagster dagster-webserver dagster-gcp mlflow fastapi locust`
+-   [ ] Configure `gcloud` CLI and authenticate
+-   [ ] Create GCS bucket for storage
 -   [ ] Join MLOps Community Slack
 -   [ ] Write your first blog post: "Why I'm doing this curriculum"
 -   [ ] Tell one person you're doing this (accountability)
 -   [ ] Block Phase 0 time on your calendar (this week)
--   [ ] Set Phase 1A target completion date: \_\_\_\_\_\_\_\_\_\_\_
+-   [ ] Set Phase 1A target completion date: ___________
 
-**Your start date:** \_\_\_\_\_\_\_\_\_\_\_
+**Your start date:** ___________
 
-**Your community tier target:** Tier \_\_\_ initially, upgrade to Tier
-\_\_\_ by Phase 3
+**Your infrastructure choice:** 🔧 VPS / ☁️ Cloud
+
+**Your community tier target:** Tier ___ initially, upgrade to Tier ___ by Phase 3
+
+**Expected monthly cost:**
+- VPS: $10-15/month (flat, predictable)
+- Cloud: $0-50/month (variable, scales with usage)
 
 ------------------------------------------------------------------------
 
 ## Final Thoughts
 
-> "The recipe for great work is: very exacting taste, plus the ability
-> to gratify it."\
-> --- Paul Graham
+> "The recipe for great work is: very exacting taste, plus the ability to gratify it."  
+> — Paul Graham
 
 **AI has solved "the ability to gratify it."**
 
@@ -3439,20 +3872,51 @@ have this pain"
 -   Community
 -   Time
 -   Honesty about what's working and what isn't
+-   🔧 **Constraints** — VPS limits force better decisions
 
 **There is no shortcut.**
 
-Persistence is part of taste. Most people quit when it gets hard. The
-ones who don't are the ones who develop real judgment.
+Persistence is part of taste. Most people quit when it gets hard. The ones who don't are the ones who develop real judgment.
 
-But persistence alone isn't enough. You also need honesty --- the
-ability to recognize when something isn't working and pivot.
+But persistence alone isn't enough. You also need honesty — the ability to recognize when something isn't working and pivot.
+
+**Cloud teaches platform usage. VPS teaches systems thinking.**
+
+**Constraint builds taste.**
 
 **Be persistent, but be honest.**
 
-------------------------------------------------------------------------
+---
 
-**Good luck.**
+## Final Notes
+
+**For VPS Users:**
+- When your server crashes at 2 AM, you'll learn more than any tutorial can teach
+- SSH'ing into a broken system develops intuition that managed services hide
+- Every resource constraint forces better architecture decisions
+- Document EVERYTHING — your future self will thank you
+
+**For Cloud Users:**
+- Use the free tier strategically — don't waste money learning
+- Document cost decisions as carefully as technical decisions
+- Understand what auto-scaling is hiding from you
+- Know when to drop down to VPS-level thinking
+
+**For Everyone:**
+- The goal isn't perfect code — it's developing judgment
+- Share your failures publicly (they teach more than successes)
+- Get feedback early and often
+- Remember: This is a 8-12 month journey, not a sprint
+
+---
+
+**Good luck. Build something real.**
+
+🔧 VPS Warriors: May your servers stay up and your logs be readable.
+
+☁️ Cloud Builders: May your bills be predictable and your services be reliable.
+
+**Now stop reading and start building.**
 
 ------------------------------------------------------------------------
 
